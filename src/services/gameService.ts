@@ -42,80 +42,44 @@ export class GameService {
       throw new Error('No active game session');
     }
     
-    // Get countries based on difficulty and continent
-    const difficultyMap = {
-      easy: ['easy'] as const,
-      medium: ['easy', 'medium'] as const,
-      hard: ['easy', 'medium', 'hard'] as const,
-      expert: ['easy', 'medium', 'hard', 'expert'] as const,
-    };
-    
-    const allowedDifficulties = difficultyMap[this.session.difficulty];
+    // Get countries based on continent (no difficulty filtering)
     let allCountries: any[] = [];
     
     if (this.selectedContinent === 'World') {
-      // Get countries from all continents
-      allCountries = allowedDifficulties.flatMap(diff => 
-        getRandomCountries(50, diff)
-      );
+      // Get all countries from all continents
+      allCountries = getRandomCountries(1000, 'expert'); // Get a large sample
     } else {
       // Get countries from specific continent
-      const continentCountries = getCountriesByContinent(this.selectedContinent);
-      allCountries = continentCountries.filter(country => 
-        allowedDifficulties.includes(country.difficulty as any)
-      );
+      allCountries = getCountriesByContinent(this.selectedContinent);
     }
     
-    // Ensure we have enough countries
-    if (allCountries.length < 4) {
-      // Fallback to world if not enough countries in selected continent
-      allCountries = allowedDifficulties.flatMap(diff => 
-        getRandomCountries(50, diff)
-      );
-    }
+    // Filter out already used countries to avoid repetition
+    let availableCountries = allCountries.filter(c => !this.usedCountryIds.has(c.id));
     
-    // For challenge and timed modes, we might want to allow some repeats after exhausting countries
-    const allowRepeats = this.session.mode === 'challenge' || this.session.mode === 'timed';
-    
-    // Filter out already used countries (unless repeats are allowed)
-    let availableCountries: any[];
-    let finalAvailableCountries: any[];
-    
-    if (allowRepeats) {
-      // For modes allowing repeats, prefer unused countries but allow repeats if needed
-      const unusedCountries = allCountries.filter(c => !this.usedCountryIds.has(c.id));
-      if (unusedCountries.length >= 4) {
-        availableCountries = unusedCountries;
-        finalAvailableCountries = unusedCountries;
-      } else {
-        // Not enough unused countries, allow some repeats
-        availableCountries = allCountries;
-        finalAvailableCountries = allCountries;
-      }
-    } else {
-      // For other modes, avoid repeats
-      availableCountries = allCountries.filter(c => !this.usedCountryIds.has(c.id));
-      
-      // If we've used all available countries, reset for this difficulty level
-      if (availableCountries.length < 4) {
-        // Clear used countries for the current difficulty level only
-        const currentDifficultyCountries = allCountries.filter(c => 
-          c.difficulty === this.session!.difficulty
-        );
-        currentDifficultyCountries.forEach(c => this.usedCountryIds.delete(c.id));
-        
-        // Get updated available countries
+    // If we don't have enough unused countries, clear some old ones
+    if (availableCountries.length < 4) {
+      // Keep only the last 20 used countries to avoid overwhelming repetition
+      const usedArray = Array.from(this.usedCountryIds);
+      if (usedArray.length > 20) {
+        const toRemove = usedArray.slice(0, usedArray.length - 20);
+        toRemove.forEach(id => this.usedCountryIds.delete(id));
         availableCountries = allCountries.filter(c => !this.usedCountryIds.has(c.id));
-        
-        // If still not enough countries, clear all used countries
-        if (availableCountries.length < 4) {
-          this.usedCountryIds.clear();
-          availableCountries = allCountries;
-        }
       }
       
-      finalAvailableCountries = availableCountries;
+      // If still not enough, clear all but the last 10
+      if (availableCountries.length < 4) {
+        this.usedCountryIds.clear();
+        // Add back the most recent 10 countries if they exist
+        const recentCountries = usedArray.slice(-10);
+        recentCountries.forEach(id => {
+          const country = allCountries.find(c => c.id === id);
+          if (country) this.usedCountryIds.add(id);
+        });
+        availableCountries = allCountries.filter(c => !this.usedCountryIds.has(c.id));
+      }
     }
+    
+    const finalAvailableCountries = availableCountries;
     
     if (finalAvailableCountries.length === 0) {
       throw new Error('No available countries for question generation');
@@ -137,7 +101,6 @@ export class GameService {
       // For continent mode, ensure wrong answers are from the same continent
       const continentCountries = getCountriesByContinent(this.selectedContinent);
       const sameContinentAvailable = continentCountries.filter(country => 
-        allowedDifficulties.includes(country.difficulty as any) && 
         country.id !== correctCountry.id &&
         !this.usedCountryIds.has(country.id)
       );
@@ -169,11 +132,9 @@ export class GameService {
       correctAnswer: correctCountry.id,
     };
     
-    // Mark all used countries (only for modes that avoid repeats)
-    if (!allowRepeats) {
-      this.usedCountryIds.add(correctCountry.id);
-      wrongCountries.forEach(country => this.usedCountryIds.add(country.id));
-    }
+    // Mark all used countries to avoid repetition
+    this.usedCountryIds.add(correctCountry.id);
+    wrongCountries.forEach(country => this.usedCountryIds.add(country.id));
     
     // 更新会话中的 currentQuestion 便于结果判定
     this.currentQuestion = question;
@@ -198,15 +159,8 @@ export class GameService {
     // 使用临时存储的 currentQuestion 进行判定
     const isCorrect = answerId === this.currentQuestion?.correctAnswer;
     
-    // Calculate score based on difficulty and streak
-    const baseScore = {
-      easy: 10,
-      medium: 20,
-      hard: 30,
-      expert: 50,
-    }[this.session.difficulty];
-    
-    // Streak bonus
+    // Fixed base score with streak bonus
+    const baseScore = 20;
     const streakBonus = isCorrect ? (this.session.streak || 0) * 5 : 0;
     const score = isCorrect ? baseScore + streakBonus : 0;
     

@@ -139,7 +139,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
       </div>
       
       {/* Question */}
-      {mode === 'country-select' ? (
+      {!gameOver && (mode === 'country-select' ? (
         <CountrySelectCard
           question={currentQuestion}
           onAnswer={handleAnswer}
@@ -155,7 +155,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
           selectedAnswer={selectedAnswer || undefined}
           disabled={showResult}
         />
-      )}
+      ))}
       
       {/* Game controls */}
       <div className="mt-6 text-center">

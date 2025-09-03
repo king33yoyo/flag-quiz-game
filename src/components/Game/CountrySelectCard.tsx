@@ -60,19 +60,16 @@ export const CountrySelectCard: React.FC<CountrySelectCardProps> = ({
               ${disabled ? 'cursor-not-allowed opacity-75' : 'border-gray-200 hover:border-gray-300'}
             `}
           >
-            <div className="flag-display w-full h-20 mb-2">
+            <div className="flag-display w-full h-24 flex items-center justify-center">
               {country.flag.startsWith('/flags/') ? (
                 <img 
                   src={country.flag} 
                   alt={`${country.name} flag`}
-                  className="w-full h-full object-contain"
+                  className="max-w-full max-h-full object-contain"
                 />
               ) : (
                 <span className="text-4xl">{country.flag}</span>
               )}
-            </div>
-            <div className="text-xs text-gray-600">
-              {country.nameZh ? country.nameZh : country.name}
             </div>
           </div>
         ))}

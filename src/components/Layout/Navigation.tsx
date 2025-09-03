@@ -21,12 +21,7 @@ export const Navigation: React.FC<NavigationProps> = ({
     { id: 'challenge', labelKey: 'gameModes.challenge.title', descriptionKey: 'gameModes.challenge.description' },
   ];
   
-  const difficulties: { id: GameSession['difficulty']; labelKey: string; color: string }[] = [
-    { id: 'easy', labelKey: 'difficulty.easy', color: 'bg-green-500' },
-    { id: 'medium', labelKey: 'difficulty.medium', color: 'bg-yellow-500' },
-    { id: 'hard', labelKey: 'difficulty.hard', color: 'bg-orange-500' },
-    { id: 'expert', labelKey: 'difficulty.expert', color: 'bg-red-500' },
-  ];
+  // Removed difficulty selection - now uses all countries
   
   return (
     <nav className="card p-6">
@@ -57,20 +52,13 @@ export const Navigation: React.FC<NavigationProps> = ({
           >
             <h3 className="font-medium text-gray-900 mb-1">{t(mode.labelKey as any)}</h3>
             <p className="text-sm text-gray-600 mb-3">{t(mode.descriptionKey as any)}</p>
-            <div className="space-y-2">
-              {difficulties.map((diff) => (
-                <Button
-                  key={`${mode.id}-${diff.id}`}
-                  variant="secondary"
-                  size="sm"
-                  onClick={() => onStartGame(mode.id, diff.id, selectedContinent)}
-                  className="w-full justify-start"
-                >
-                  <span className={`w-3 h-3 rounded-full ${diff.color} mr-2`}></span>
-                  {t(diff.labelKey as any)}
-                </Button>
-              ))}
-            </div>
+            <Button
+              variant="primary"
+              onClick={() => onStartGame(mode.id, 'expert', selectedContinent)}
+              className="w-full"
+            >
+              {t('game.start')}
+            </Button>
           </div>
         ))}
       </div>
