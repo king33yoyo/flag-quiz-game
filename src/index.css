@@ -381,17 +381,58 @@ header {
   border-bottom: 1px solid #e5e7eb;
 }
 
-/* Flag display */
-.flag-display {
-  width: 12rem;
-  height: 8rem;
-  font-size: 6rem;
+/* Flag display utilities */
+.flag-container {
   display: flex;
   align-items: center;
   justify-content: center;
   background-color: #f9fafb;
-  border-radius: 0.5rem;
-  border: 2px solid #e5e7eb;
+  border-radius: 0.375rem;
+  overflow: hidden;
+}
+
+.flag-container-square {
+  aspect-ratio: 1/1;
+}
+
+.flag-container-3-2 {
+  aspect-ratio: 3/2;
+}
+
+.flag-container-4-3 {
+  aspect-ratio: 4/3;
+}
+
+.flag-container-5-3 {
+  aspect-ratio: 5/3;
+}
+
+/* Special flag adjustments */
+.flag-nepal {
+  transform: scale(1.1);
+  padding: 0.25rem;
+}
+
+.flag-wales {
+  transform: scale(1.05);
+}
+
+/* Responsive flag sizing */
+@media (max-width: 640px) {
+  .flag-container-sm {
+    width: 3rem;
+    height: 2rem;
+  }
+  
+  .flag-container-md {
+    width: 4rem;
+    height: 3rem;
+  }
+  
+  .flag-container-lg {
+    width: 6rem;
+    height: 4rem;
+  }
 }
 
 /* Modal */

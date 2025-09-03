@@ -1,6 +1,7 @@
 import type { GameQuestion } from '../../types';
 import { useI18n } from '../../i18n';
 import { soundService } from '../../services/soundService';
+import { FlagDisplay } from '../UI/FlagDisplay';
 
 interface QuestionCardProps {
   question: GameQuestion;
@@ -39,17 +40,11 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
           {t('game.whichCountry')}
         </h2>
         <div className="flex justify-center">
-          <div className="flag-display w-48 h-32">
-            {question.country.flag.startsWith('/flags/') ? (
-              <img 
-                src={question.country.flag} 
-                alt={`${question.country.name} flag`}
-                className="w-full h-full object-contain"
-              />
-            ) : (
-              <span className="text-6xl">{question.country.flag}</span>
-            )}
-          </div>
+          <FlagDisplay 
+            country={question.country}
+            size="lg"
+            aspectRatio="auto"
+          />
         </div>
       </div>
       
