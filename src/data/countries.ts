@@ -4904,27 +4904,6 @@ export const countries: Country[] = [
     "difficulty": "expert"
   },
   {
-    "id": "tw",
-    "name": "Taiwan",
-    "flag": "/flags/tw.png",
-    "continent": "Asia",
-    "subregion": "Eastern Asia",
-    "capital": "Taipei",
-    "population": 23503349,
-    "area": 36193,
-    "languages": [
-      "Chinese"
-    ],
-    "currency": "New Taiwan dollar",
-    "coordinates": [
-      23.5,
-      121
-    ],
-    "landlocked": false,
-    "independent": false,
-    "difficulty": "expert"
-  },
-  {
     "id": "tj",
     "name": "Tajikistan",
     "nameZh": "塔吉克斯坦",
