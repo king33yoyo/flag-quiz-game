@@ -1,10 +1,19 @@
 export interface Country {
   id: string;
   name: string;
+  nameZh?: string; // 中文名称
   flag: string; // SVG or PNG URL
   continent: string;
+  subregion?: string; // 子区域（如：Western Europe, Southeast Asia）
   capital: string;
   population: number;
+  area?: number; // 面积（平方公里）
+  languages?: string[]; // 官方语言
+  currency?: string; // 货币
+  coordinates?: [number, number]; // [纬度, 经度]
+  neighbours?: string[]; // 邻国ID列表
+  landlocked?: boolean; // 是否内陆国
+  independent?: boolean; // 是否主权国家
   difficulty: 'easy' | 'medium' | 'hard' | 'expert';
 }
 
@@ -56,3 +65,14 @@ export interface GameStats {
   averageScore: number;
   bestScore: number;
 }
+
+export type Continent = 
+  | 'Africa'
+  | 'Asia'
+  | 'Europe'
+  | 'North America'
+  | 'South America'
+  | 'Oceania'
+  | 'Antarctica';
+
+export type RegionFilter = Continent | 'World';

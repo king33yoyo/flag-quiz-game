@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { GameService } from '../../services/gameService';
 import { soundService } from '../../services/soundService';
-import type { GameQuestion, GameSession } from '../../types';
+import type { GameQuestion, GameSession, RegionFilter } from '../../types';
 import { QuestionCard } from './QuestionCard';
+import { CountrySelectCard } from './CountrySelectCard';
 import { ScoreDisplay } from './ScoreDisplay';
 import { Timer } from './Timer';
 import { Button } from '../UI/Button';
@@ -12,12 +13,14 @@ import { useI18n } from '../../i18n';
 interface GameBoardProps {
   mode: GameSession['mode'];
   difficulty: GameSession['difficulty'];
+  continent: RegionFilter;
   onGameEnd: (session: GameSession) => void;
 }
 
 export const GameBoard: React.FC<GameBoardProps> = ({
   mode,
   difficulty,
+  continent,
   onGameEnd,
 }) => {
   const [gameService] = useState(() => GameService.getInstance());
@@ -31,7 +34,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
   
   useEffect(() => {
     // Start new game
-    const newSession = gameService.startGame(mode, difficulty);
+    const newSession = gameService.startGame(mode, difficulty, continent);
     setSession(newSession);
     loadNewQuestion();
     
@@ -39,7 +42,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
     if (mode === 'timed') {
       setTimeLeft(60);
     }
-  }, [mode, difficulty, gameService]);
+  }, [mode, difficulty, continent, gameService]);
   
   const loadNewQuestion = () => {
     const question = gameService.generateQuestion();
@@ -75,7 +78,8 @@ export const GameBoard: React.FC<GameBoardProps> = ({
     
     // Load next question after delay
     setTimeout(() => {
-      if (session?.totalQuestions && session.totalQuestions >= 9) {
+      // Only end after 10 questions for non-timed and non-challenge modes
+      if (mode !== 'timed' && mode !== 'challenge' && session?.totalQuestions && session.totalQuestions >= 9) {
         endGame();
       } else {
         loadNewQuestion();
@@ -135,13 +139,23 @@ export const GameBoard: React.FC<GameBoardProps> = ({
       </div>
       
       {/* Question */}
-      <QuestionCard
-        question={currentQuestion}
-        onAnswer={handleAnswer}
-        showResult={showResult}
-        selectedAnswer={selectedAnswer || undefined}
-        disabled={showResult}
-      />
+      {mode === 'country-select' ? (
+        <CountrySelectCard
+          question={currentQuestion}
+          onAnswer={handleAnswer}
+          showResult={showResult}
+          selectedAnswer={selectedAnswer || undefined}
+          disabled={showResult}
+        />
+      ) : (
+        <QuestionCard
+          question={currentQuestion}
+          onAnswer={handleAnswer}
+          showResult={showResult}
+          selectedAnswer={selectedAnswer || undefined}
+          disabled={showResult}
+        />
+      )}
       
       {/* Game controls */}
       <div className="mt-6 text-center">

@@ -43,6 +43,7 @@ export const translations = {
       playAgain: "Play Again",
       timeRemaining: "Time Remaining",
       whichCountry: "Which country does this flag belong to?",
+      whichCountryFlag: "Which flag belongs to {country}?",
       correct: "✓ Correct! This is {country}",
       wrong: "✗ Wrong! The correct answer is {country}"
     },
@@ -60,6 +61,19 @@ export const translations = {
     header: {
       leaderboard: "Leaderboard",
       profile: "Profile"
+    },
+    
+    // Continent
+    continent: {
+      select: "Select Region:",
+      world: "World",
+      africa: "Africa",
+      asia: "Asia",
+      europe: "Europe",
+      "north america": "North America",
+      "south america": "South America",
+      oceania: "Oceania",
+      antarctica: "Antarctica"
     },
     
     // Game Over
@@ -112,6 +126,7 @@ export const translations = {
       playAgain: "再玩一次",
       timeRemaining: "剩余时间",
       whichCountry: "这面国旗属于哪个国家？",
+      whichCountryFlag: "{country}的国旗是哪一面？",
       correct: "✓ 正确！这是{country}",
       wrong: "✗ 错误！正确答案是{country}"
     },
@@ -129,6 +144,19 @@ export const translations = {
     header: {
       leaderboard: "排行榜",
       profile: "个人资料"
+    },
+    
+    // Continent
+    continent: {
+      select: "选择地区：",
+      world: "全球",
+      africa: "非洲",
+      asia: "亚洲",
+      europe: "欧洲",
+      "north america": "北美洲",
+      "south america": "南美洲",
+      oceania: "大洋洲",
+      antarctica: "南极洲"
     },
     
     // Game Over

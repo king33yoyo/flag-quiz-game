@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import type { GameSession } from './types';
+import type { GameSession, RegionFilter } from './types';
 import { I18nProvider, useI18n } from './i18n';
 import { Header } from './components/Layout/Header';
 import { Navigation } from './components/Layout/Navigation';
@@ -12,12 +12,13 @@ function AppContent() {
   const [currentGame, setCurrentGame] = useState<{
     mode: GameSession['mode'];
     difficulty: GameSession['difficulty'];
+    continent: RegionFilter;
   } | null>(null);
 
   const { t } = useI18n();
 
-  const handleStartGame = (mode: GameSession['mode'], difficulty: GameSession['difficulty']) => {
-    setCurrentGame({ mode, difficulty });
+  const handleStartGame = (mode: GameSession['mode'], difficulty: GameSession['difficulty'], continent: RegionFilter = 'World') => {
+    setCurrentGame({ mode, difficulty, continent });
   };
 
   const handleGameEnd = (session: GameSession) => {
@@ -47,6 +48,7 @@ function AppContent() {
             <GameBoard
               mode={currentGame.mode}
               difficulty={currentGame.difficulty}
+              continent={currentGame.continent}
               onGameEnd={handleGameEnd}
             />
           </div>

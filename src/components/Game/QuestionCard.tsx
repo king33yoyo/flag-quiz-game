@@ -70,7 +70,9 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
               ${disabled ? 'cursor-not-allowed opacity-75' : 'border-gray-200 hover:border-gray-300'}
             `}
           >
-            <div className="font-medium text-gray-800">{country.name}</div>
+            <div className="font-medium text-gray-800">
+              {country.nameZh ? `${country.nameZh} (${country.name})` : country.name}
+            </div>
           </div>
         ))}
       </div>
@@ -82,9 +84,9 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
             : 'bg-red-100 text-red-800'
         }`}>
           {selectedAnswer === question.correctAnswer ? (
-            <span>{tWithParams('game.correct', { country: question.country.name })}</span>
+            <span>{tWithParams('game.correct', { country: question.country.nameZh || question.country.name })}</span>
           ) : (
-            <span>{tWithParams('game.wrong', { country: question.country.name })}</span>
+            <span>{tWithParams('game.wrong', { country: question.country.nameZh || question.country.name })}</span>
           )}
         </div>
       )}

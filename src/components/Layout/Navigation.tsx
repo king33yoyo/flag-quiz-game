@@ -1,15 +1,18 @@
-import type { GameSession } from '../../types';
+import { useState } from 'react';
+import type { GameSession, RegionFilter } from '../../types';
 import { Button } from '../UI/Button';
 import { useI18n } from '../../i18n';
+import { getContinents } from '../../data/countries';
 
 interface NavigationProps {
-  onStartGame: (mode: GameSession['mode'], difficulty: GameSession['difficulty']) => void;
+  onStartGame: (mode: GameSession['mode'], difficulty: GameSession['difficulty'], continent: RegionFilter) => void;
 }
 
 export const Navigation: React.FC<NavigationProps> = ({
   onStartGame,
 }) => {
   const { t } = useI18n();
+  const [selectedContinent, setSelectedContinent] = useState<RegionFilter>('World');
   
   const gameModes: { id: GameSession['mode']; labelKey: string; descriptionKey: string }[] = [
     { id: 'flag-identify', labelKey: 'gameModes.flagIdentify.title', descriptionKey: 'gameModes.flagIdentify.description' },
@@ -29,6 +32,23 @@ export const Navigation: React.FC<NavigationProps> = ({
     <nav className="card p-6">
       <h2 className="text-xl font-semibold text-gray-800 mb-4">{t('game.start')}</h2>
       
+      {/* Continent Selection */}
+      <div className="mb-6">
+        <h3 className="text-lg font-medium text-gray-700 mb-3">{t('continent.select')}</h3>
+        <div className="flex flex-wrap gap-2">
+          {['World', ...getContinents()].map((continent) => (
+            <Button
+              key={continent}
+              variant={selectedContinent === continent ? 'primary' : 'secondary'}
+              size="sm"
+              onClick={() => setSelectedContinent(continent as RegionFilter)}
+            >
+              {t(`continent.${continent.toLowerCase()}`)}
+            </Button>
+          ))}
+        </div>
+      </div>
+      
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
         {gameModes.map((mode) => (
           <div
@@ -43,7 +63,7 @@ export const Navigation: React.FC<NavigationProps> = ({
                   key={`${mode.id}-${diff.id}`}
                   variant="secondary"
                   size="sm"
-                  onClick={() => onStartGame(mode.id, diff.id)}
+                  onClick={() => onStartGame(mode.id, diff.id, selectedContinent)}
                   className="w-full justify-start"
                 >
                   <span className={`w-3 h-3 rounded-full ${diff.color} mr-2`}></span>
