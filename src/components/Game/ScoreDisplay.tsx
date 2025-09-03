@@ -18,24 +18,26 @@ export const ScoreDisplay: React.FC<ScoreDisplayProps> = ({
   const accuracy = totalQuestions > 0 ? Math.round((correctAnswers / totalQuestions) * 100) : 0;
   
   return (
-    <div className="card mb-6">
+    <div className="card mb-6 animate-fadeIn">
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-        <div>
-          <div className="text-2xl font-bold text-blue-600">{score}</div>
-          <div className="text-sm text-gray-600">{t('stats.score')}</div>
+        <div className="animate-scaleIn" style={{ animationDelay: '0.1s' }}>
+          <div className="text-3xl font-bold text-blue-600 animate-pulse">{score}</div>
+          <div className="text-sm text-gray-600 mt-1">{t('stats.score')}</div>
         </div>
-        <div>
-          <div className="text-2xl font-bold text-green-600">{correctAnswers}/{totalQuestions}</div>
-          <div className="text-sm text-gray-600">{t('stats.correct')}</div>
+        <div className="animate-scaleIn" style={{ animationDelay: '0.2s' }}>
+          <div className="text-3xl font-bold text-green-600">{correctAnswers}/{totalQuestions}</div>
+          <div className="text-sm text-gray-600 mt-1">{t('stats.correct')}</div>
         </div>
-        <div>
-          <div className="text-2xl font-bold text-purple-600">{accuracy}%</div>
-          <div className="text-sm text-gray-600">{t('stats.accuracy')}</div>
+        <div className="animate-scaleIn" style={{ animationDelay: '0.3s' }}>
+          <div className="text-3xl font-bold text-purple-600">{accuracy}%</div>
+          <div className="text-sm text-gray-600 mt-1">{t('stats.accuracy')}</div>
         </div>
         {streak > 0 && (
-          <div>
-            <div className="text-2xl font-bold text-orange-600">{streak}🔥</div>
-            <div className="text-sm text-gray-600">{t('stats.streak')}</div>
+          <div className="animate-scaleIn" style={{ animationDelay: '0.4s' }}>
+            <div className={`text-3xl font-bold text-orange-600 ${streak >= 5 ? 'animate-pulse' : ''}`}>
+              {streak}🔥
+            </div>
+            <div className="text-sm text-gray-600 mt-1">{t('stats.streak')}</div>
           </div>
         )}
       </div>

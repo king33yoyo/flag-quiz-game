@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { GameService } from '../../services/gameService';
 import { soundService } from '../../services/soundService';
 import type { GameQuestion, GameSession, RegionFilter } from '../../types';
@@ -8,6 +8,8 @@ import { ScoreDisplay } from './ScoreDisplay';
 import { Timer } from './Timer';
 import { Button } from '../UI/Button';
 import { Modal } from '../UI/Modal';
+import { ErrorBoundary } from '../UI/ErrorBoundary';
+import { GameOverContent } from './GameOverContent';
 import { useI18n } from '../../i18n';
 
 interface GameBoardProps {
@@ -31,6 +33,15 @@ export const GameBoard: React.FC<GameBoardProps> = ({
   const [gameOver, setGameOver] = useState(false);
   const [timeLeft, setTimeLeft] = useState(60); // 60 seconds for timed mode
   const { t } = useI18n();
+  const isGameEndingRef = useRef(false);
+  
+  const loadNewQuestion = useCallback(() => {
+    const question = gameService.generateQuestion();
+    gameService.setCurrentQuestion(question);
+    setCurrentQuestion(question);
+    setSelectedAnswer(null);
+    setShowResult(false);
+  }, [gameService]);
   
   useEffect(() => {
     // Start new game
@@ -42,15 +53,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
     if (mode === 'timed') {
       setTimeLeft(60);
     }
-  }, [mode, difficulty, continent, gameService]);
-  
-  const loadNewQuestion = () => {
-    const question = gameService.generateQuestion();
-    gameService.setCurrentQuestion(question);
-    setCurrentQuestion(question);
-    setSelectedAnswer(null);
-    setShowResult(false);
-  };
+  }, [mode, difficulty, continent, gameService, loadNewQuestion]);
   
   const handleAnswer = (answerId: string) => {
     if (!currentQuestion || selectedAnswer) return;
@@ -93,30 +96,69 @@ export const GameBoard: React.FC<GameBoardProps> = ({
     }
   };
   
-  const endGame = () => {
-    const finalSession = gameService.endGame();
-    setSession(finalSession);
-    setGameOver(true);
-    soundService.playGameOver();
-    onGameEnd(finalSession);
-  };
+  const endGame = useCallback(() => {
+    // Prevent multiple calls to endGame
+    if (isGameEndingRef.current || gameOver) {
+      return;
+    }
+    
+    isGameEndingRef.current = true;
+    
+    try {
+      // Check if game session still exists
+      if (gameService['session']) {
+        const finalSession = gameService.endGame();
+        setSession(finalSession);
+        setGameOver(true);
+        onGameEnd(finalSession);
+      } else {
+        // Fallback: create a session from current state
+        const fallbackSession: GameSession = {
+          id: `session-${Date.now()}`,
+          userId: 'demo-user',
+          mode,
+          difficulty,
+          score: session?.score || 0,
+          correctAnswers: session?.correctAnswers || 0,
+          totalQuestions: session?.totalQuestions || 0,
+          startTime: session?.startTime || new Date(),
+          endTime: new Date(),
+          streak: session?.streak || 0,
+        };
+        setSession(fallbackSession);
+        setGameOver(true);
+        onGameEnd(fallbackSession);
+      }
+      
+      // Play game over sound with error handling
+      try {
+        soundService.playGameOver();
+      } catch (soundError) {
+        console.warn('Failed to play game over sound:', soundError);
+      }
+    } catch (error) {
+      console.error('Error ending game:', error);
+      // Ensure game over state is set even if there's an error
+      setGameOver(true);
+    }
+  }, [gameService, gameOver, session, mode, difficulty, onGameEnd]);
   
   if (!session || !currentQuestion) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="text-xl">Loading game...</div>
+        <div className="text-xl text-white">Loading game...</div>
       </div>
     );
   }
   
   return (
-    <div className="max-w-4xl mx-auto p-4">
+    <div className="max-w-4xl mx-auto p-4 game-board">
       {/* Game header */}
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold text-center text-gray-800 mb-2">
+      <div className="mb-6 animate-fadeIn">
+        <h1 className="text-4xl font-bold text-center text-white mb-2 text-shadow-lg">
           {t('app.title')}
         </h1>
-        <div className="text-center text-gray-600">
+        <div className="text-center text-gray-200 text-lg">
           {t(`gameModes.${mode.replace('-', '')}.title`)} | {t(`difficulty.${difficulty}`)}
         </div>
       </div>
@@ -130,11 +172,20 @@ export const GameBoard: React.FC<GameBoardProps> = ({
           streak={session.streak}
         />
         {mode === 'timed' && (
-          <Timer
-            initialTime={timeLeft}
-            onTimeUp={handleTimeUp}
-            isActive={!gameOver}
-          />
+          <ErrorBoundary fallback={
+            <div className="card text-center">
+              <div className="text-3xl font-bold text-red-600">
+                00:00
+              </div>
+              <div className="text-sm text-gray-600 mt-1">Timer Error</div>
+            </div>
+          }>
+            <Timer
+              initialTime={timeLeft}
+              onTimeUp={handleTimeUp}
+              isActive={!gameOver}
+            />
+          </ErrorBoundary>
         )}
       </div>
       
@@ -171,41 +222,15 @@ export const GameBoard: React.FC<GameBoardProps> = ({
       <Modal
         isOpen={gameOver}
         onClose={() => setGameOver(false)}
-        title={t('gameOver.title')}
         size="md"
       >
-        <div className="text-center">
-          <div className="mb-4">
-            <div className="text-4xl font-bold text-blue-600 mb-2">
-              {session.score}
-            </div>
-            <div className="text-gray-600">{t('stats.finalScore')}</div>
-          </div>
-          
-          <div className="grid grid-cols-2 gap-4 mb-6">
-            <div>
-              <div className="text-2xl font-semibold text-green-600">
-                {session.correctAnswers}/{session.totalQuestions}
-              </div>
-              <div className="text-sm text-gray-600">{t('stats.correct')}</div>
-            </div>
-            <div>
-              <div className="text-2xl font-semibold text-purple-600">
-                {session.totalQuestions > 0 
-                  ? Math.round((session.correctAnswers / session.totalQuestions) * 100)
-                  : 0}%
-              </div>
-              <div className="text-sm text-gray-600">{t('stats.accuracy')}</div>
-            </div>
-          </div>
-          
-          <Button
-            onClick={() => window.location.reload()}
-            variant="primary"
-          >
-            {t('game.playAgain')}
-          </Button>
-        </div>
+        <GameOverContent 
+          session={session}
+          mode={mode}
+          difficulty={difficulty}
+          continent={continent}
+          onPlayAgain={() => window.location.reload()}
+        />
       </Modal>
     </div>
   );

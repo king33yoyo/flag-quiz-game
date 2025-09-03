@@ -1,4 +1,4 @@
-import type { GameQuestion, GameSession, RegionFilter } from '../types';
+import type { GameQuestion, GameSession, RegionFilter, Country } from '../types';
 import { getRandomCountries, getCountriesByContinent } from '../data/countries';
 
 export class GameService {
@@ -43,7 +43,7 @@ export class GameService {
     }
     
     // Get countries based on continent (no difficulty filtering)
-    let allCountries: any[] = [];
+    let allCountries: Country[] = [];
     
     if (this.selectedContinent === 'World') {
       // Get all countries from all continents
@@ -89,7 +89,7 @@ export class GameService {
     const correctCountry = finalAvailableCountries[Math.floor(Math.random() * finalAvailableCountries.length)];
     
     // Select 3 wrong answers from available countries (excluding used ones and correct answer)
-    let wrongCountries: any[] = [];
+    let wrongCountries: Country[] = [];
     
     if (this.selectedContinent === 'World') {
       // For world mode, wrong answers from available countries

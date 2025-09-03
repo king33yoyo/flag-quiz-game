@@ -31,7 +31,9 @@ class SoundService {
 
   private createFallbackSounds() {
     // Create simple beep sounds using Web Audio API as fallback
-    const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+    const AudioContextClass = window.AudioContext || (window as Window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+    if (!AudioContextClass) return;
+    const audioContext = new AudioContextClass();
     
     // Simple beep function
     const createBeep = (frequency: number, duration: number) => {

@@ -4,6 +4,7 @@ import { I18nProvider, useI18n } from './i18n';
 import { Header } from './components/Layout/Header';
 import { Navigation } from './components/Layout/Navigation';
 import { GameBoard } from './components/Game/GameBoard';
+import { Leaderboard } from './components/Leaderboard/Leaderboard';
 
 /**
  * App 根组件，负责路由与游戏启动/结束的顶层状态管理
@@ -14,6 +15,7 @@ function AppContent() {
     difficulty: GameSession['difficulty'];
     continent: RegionFilter;
   } | null>(null);
+  const [showLeaderboard, setShowLeaderboard] = useState(false);
 
   const { t } = useI18n();
 
@@ -31,8 +33,8 @@ function AppContent() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Header />
+    <div className="min-h-screen relative" style={{ zIndex: 2 }}>
+      <Header onShowLeaderboard={() => setShowLeaderboard(true)} />
       
       <main className="max-w-7xl mx-auto px-4 py-8">
         {currentGame ? (
@@ -66,6 +68,12 @@ function AppContent() {
           </div>
         )}
       </main>
+      
+      {/* Leaderboard Modal */}
+      <Leaderboard 
+        isOpen={showLeaderboard}
+        onClose={() => setShowLeaderboard(false)}
+      />
     </div>
   );
 }

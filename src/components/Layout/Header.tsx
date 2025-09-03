@@ -6,10 +6,12 @@ import { soundService } from '../../services/soundService';
 
 interface HeaderProps {
   title?: string;
+  onShowLeaderboard?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
   title,
+  onShowLeaderboard,
 }) => {
   const { language, setLanguage, t } = useI18n();
   const [soundEnabled, setSoundEnabled] = useState(true);
@@ -36,11 +38,12 @@ export const Header: React.FC<HeaderProps> = ({
             {title || t('app.title')}
           </h1>
           <div className="flex items-center space-x-4">
-            <Button variant="secondary" size="sm">
+            <Button 
+              variant="secondary" 
+              size="sm"
+              onClick={onShowLeaderboard}
+            >
               {t('header.leaderboard')}
-            </Button>
-            <Button variant="secondary" size="sm">
-              {t('header.profile')}
             </Button>
             <Button
               variant="outline"

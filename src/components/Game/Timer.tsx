@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useI18n } from '../../i18n';
 import { soundService } from '../../services/soundService';
 
@@ -15,15 +15,24 @@ export const Timer: React.FC<TimerProps> = ({
 }) => {
   const [timeLeft, setTimeLeft] = useState(initialTime);
   const { t } = useI18n();
+  const onTimeUpRef = useRef(onTimeUp);
+  const hasTriggeredRef = useRef(false);
+  
+  // Update ref when onTimeUp changes
+  useEffect(() => {
+    onTimeUpRef.current = onTimeUp;
+  }, [onTimeUp]);
   
   useEffect(() => {
-    if (!isActive) return;
+    if (!isActive) {
+      hasTriggeredRef.current = false;
+      return;
+    }
     
     const timer = setInterval(() => {
       setTimeLeft((prev) => {
         if (prev <= 1) {
           clearInterval(timer);
-          onTimeUp?.();
           return 0;
         }
         
@@ -37,11 +46,23 @@ export const Timer: React.FC<TimerProps> = ({
     }, 1000);
     
     return () => clearInterval(timer);
-  }, [isActive, onTimeUp]);
+  }, [isActive]);
+  
+  // Effect to trigger onTimeUp when time reaches 0
+  useEffect(() => {
+    if (timeLeft === 0 && !hasTriggeredRef.current && isActive) {
+      hasTriggeredRef.current = true;
+      // Use setTimeout to ensure this happens after render
+      setTimeout(() => {
+        onTimeUpRef.current?.();
+      }, 0);
+    }
+  }, [timeLeft, isActive]);
   
   // Reset timer when initialTime changes
   useEffect(() => {
     setTimeLeft(initialTime);
+    hasTriggeredRef.current = false;
   }, [initialTime]);
   
   const minutes = Math.floor(timeLeft / 60);

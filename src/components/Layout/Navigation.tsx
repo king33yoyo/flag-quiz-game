@@ -30,7 +30,7 @@ export const Navigation: React.FC<NavigationProps> = ({
       {/* Continent Selection */}
       <div className="mb-6">
         <h3 className="text-lg font-medium text-gray-700 mb-3">{t('continent.select')}</h3>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-4">
           {['World', ...getContinents()].map((continent) => (
             <Button
               key={continent}
@@ -50,8 +50,8 @@ export const Navigation: React.FC<NavigationProps> = ({
             key={mode.id}
             className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
           >
-            <h3 className="font-medium text-gray-900 mb-1">{t(mode.labelKey as any)}</h3>
-            <p className="text-sm text-gray-600 mb-3">{t(mode.descriptionKey as any)}</p>
+            <h3 className="font-medium text-gray-900 mb-1">{t(mode.labelKey as keyof typeof import('../../i18n/translations').translations)}</h3>
+            <p className="text-sm text-gray-600 mb-3">{t(mode.descriptionKey as keyof typeof import('../../i18n/translations').translations)}</p>
             <Button
               variant="primary"
               onClick={() => onStartGame(mode.id, 'expert', selectedContinent)}
