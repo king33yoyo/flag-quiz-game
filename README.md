@@ -7,10 +7,14 @@
 - 🌍 **197个国家和地区** - 覆盖全球所有主要国家
 - 🎮 **多种游戏模式** - 包括国旗识别、国家选择、限时挑战和生存模式
 - 🗺️ **大洲筛选** - 可以选择特定大洲进行练习
+- 🏆 **排行榜系统** - 记录生存模式的前10名成绩，支持玩家命名
 - 🎯 **智能防重复** - 避免短时间内出现重复的国旗
 - 🏳️ **特殊国旗支持** - 包括尼泊尔等非矩形国旗的正确显示
 - 🌐 **双语支持** - 中文和英文界面切换
 - 📱 **响应式设计** - 支持手机、平板和桌面设备
+- 🎨 **地理主题背景** - 使用CSS创建的世界地图风格背景效果
+- 🛡️ **错误边界** - 优雅的错误处理，防止游戏崩溃
+- 💾 **本地存储** - 排行榜数据持久化保存
 
 ## 游戏模式 / Game Modes
 
@@ -29,6 +33,7 @@
 ### 4. 生存模式 / Survival Mode
 - 连续答题，直到答错为止
 - 测试你的极限准确率
+- 高分可进入排行榜，记录你的成就！
 
 ## 技术栈 / Tech Stack
 
@@ -83,24 +88,34 @@ src/
 │   │   ├── QuestionCard.tsx   # 问题卡片
 │   │   ├── CountrySelectCard.tsx  # 国家选择卡片
 │   │   ├── ScoreDisplay.tsx    # 分数显示
-│   │   └── Timer.tsx          # 计时器
+│   │   ├── Timer.tsx          # 计时器
+│   │   └── GameOverContent.tsx # 游戏结束内容
 │   ├── Layout/         # 布局组件
 │   │   ├── Header.tsx         # 页面头部
 │   │   └── Navigation.tsx     # 导航菜单
+│   ├── Leaderboard/     # 排行榜组件
+│   │   └── Leaderboard.tsx    # 排行榜界面
 │   └── UI/             # 通用UI组件
 │       ├── Button.tsx         # 按钮组件
 │       ├── Modal.tsx          # 模态框
-│       └── FlagDisplay.tsx    # 国旗显示组件
+│       ├── FlagDisplay.tsx    # 国旗显示组件
+│       └── ErrorBoundary.tsx  # 错误边界
 ├── data/               # 数据文件
 │   └── countries.ts    # 国家数据
 ├── services/           # 服务层
 │   ├── gameService.ts  # 游戏逻辑服务
-│   └── soundService.ts # 音效服务
+│   ├── soundService.ts # 音效服务
+│   └── storageService.ts # 存储服务
 ├── i18n/              # 国际化
 │   ├── translations.ts # 翻译文件
+│   ├── I18nContext.ts  # i18n上下文
+│   ├── I18nProvider.tsx # i18n提供者
+│   ├── useI18n.ts      # i18n钩子
+│   ├── utils.ts        # 工具函数
 │   └── index.ts        # i18n配置
-└── types/              # TypeScript类型定义
-    └── index.ts
+├── types/              # TypeScript类型定义
+│   └── index.ts
+└── index.css           # 全局样式
 ```
 
 ## 游戏规则 / Game Rules
@@ -111,6 +126,7 @@ src/
 4. **回答问题** - 点击正确的答案
 5. **查看结果** - 系统会显示是否正确并更新分数
 6. **游戏结束** - 根据模式不同，结束条件也不同
+7. **保存成绩** - 生存模式的高分可以保存到排行榜
 
 ## 计分规则 / Scoring
 
@@ -145,6 +161,15 @@ src/
 - 特别感谢React、Vite和Tailwind CSS团队
 
 ## 版本历史 / Version History
+
+### v1.1.0 (2024-01-XX)
+- 🏆 新增排行榜系统，记录生存模式前10成绩
+- 🎨 添加地理主题背景效果，提升视觉体验
+- 🛡️ 实现错误边界，提高游戏稳定性
+- 💾 排行榜数据本地存储，持久化保存
+- 🔧 优化i18n架构，修复React 19快速刷新警告
+- 🎯 修复计时器状态更新问题
+- 📱 改进UI交互体验
 
 ### v1.0.0 (2024-01-XX)
 - 初始版本发布
