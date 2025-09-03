@@ -44,7 +44,7 @@ export const CountrySelectCard: React.FC<CountrySelectCardProps> = ({
         </div>
       </div>
       
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
         {question.options.map((country) => (
           <div
             key={country.id}
@@ -64,7 +64,6 @@ export const CountrySelectCard: React.FC<CountrySelectCardProps> = ({
             <FlagDisplay 
               country={country}
               size="md"
-              aspectRatio="3-2"
               className="w-full"
             />
           </div>

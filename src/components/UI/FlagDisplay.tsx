@@ -4,88 +4,66 @@ interface FlagDisplayProps {
   country: Country;
   size?: 'sm' | 'md' | 'lg';
   className?: string;
-  aspectRatio?: 'square' | '3-2' | '4-3' | '5-3' | 'auto';
 }
 
 export const FlagDisplay: React.FC<FlagDisplayProps> = ({
   country,
   size = 'md',
   className = '',
-  aspectRatio = 'auto',
 }) => {
-  // Size configurations
+  // Size configurations with proper styling
   const sizeConfig = {
     sm: {
-      container: 'w-16 h-12',
+      container: 'w-20 h-14 p-1',
       emoji: 'text-2xl',
-      image: 'max-w-[80%] max-h-[80%]',
+      image: 'w-full h-full object-contain',
     },
     md: {
-      container: 'w-24 h-16',
+      container: 'w-28 h-20 p-2',
       emoji: 'text-4xl',
-      image: 'max-w-[90%] max-h-[90%]',
+      image: 'w-full h-full object-contain',
     },
     lg: {
-      container: 'w-48 h-32',
+      container: 'w-48 h-32 p-3',
       emoji: 'text-6xl',
-      image: 'max-w-[95%] max-h-[95%]',
+      image: 'w-full h-full object-contain',
     },
   };
 
   const config = sizeConfig[size];
   
-  // Countries with special aspect ratios
-  const specialFlags = {
-    // Nepal has a unique triangular shape
-    np: { aspectRatio: '3/4', scale: 1.2, padding: true },
-    // Some flags are non-standard
-    ch: { aspectRatio: '1/1', scale: 1.0 }, // Switzerland
-    va: { aspectRatio: '1/1', scale: 1.0 }, // Vatican City
-    sn: { aspectRatio: '2/3', scale: 1.1 }, // Senegal
-    // Nordic flags often use specific ratios
-    se: { aspectRatio: '5/8', scale: 1.0 }, // Sweden
-    no: { aspectRatio: '8/11', scale: 1.0 }, // Norway
-    dk: { aspectRatio: '28/37', scale: 1.0 }, // Denmark
-    fi: { aspectRatio: '11/18', scale: 1.0 }, // Finland
-    is: { aspectRatio: '18/25', scale: 1.0 }, // Iceland
-  };
+  // Special handling for Nepal's unique flag - just add extra padding
+  const isNepal = country.id === 'np';
+  const nepalPadding = isNepal ? 'p-3' : '';
   
-  const specialConfig = specialFlags[country.id as keyof typeof specialFlags];
-  
-  // Determine aspect ratio class
-  const getAspectRatioClass = () => {
-    if (specialConfig) return '';
-    if (aspectRatio === 'auto') return '';
-    return `flag-container-${aspectRatio}`;
-  };
-  
-  // Special handling classes
-  const specialClasses = specialConfig 
-    ? `${(specialConfig as any).padding ? 'p-1' : ''} flag-${country.id}`
-    : '';
-  
-  // Base classes
+  // Base classes with consistent styling
   const baseClasses = `
-    flag-container
-    ${getAspectRatioClass()}
     ${config.container}
-    ${specialClasses}
+    ${nepalPadding}
+    flex items-center justify-center
+    bg-white border-2 border-gray-300 rounded-lg
+    overflow-hidden
     ${className}
-  `;
+  `.trim();
 
   return (
-    <div className={baseClasses.trim()}>
+    <div className={baseClasses}>
       {country.flag.startsWith('/flags/') ? (
         <img 
           src={country.flag} 
           alt={`${country.name} flag`}
-          className={`
-            ${config.image}
-            object-contain
-            ${specialConfig ? `scale-[${specialConfig.scale}]` : ''}
-          `}
-          style={{
-            aspectRatio: specialConfig?.aspectRatio || aspectRatio === 'auto' ? 'auto' : undefined,
+          className={config.image}
+          onError={(e) => {
+            // Fallback to emoji if image fails to load
+            const target = e.target as HTMLImageElement;
+            target.style.display = 'none';
+            const parent = target.parentElement;
+            if (parent) {
+              const fallback = document.createElement('span');
+              fallback.className = config.emoji + ' leading-none';
+              fallback.textContent = '🏳️';
+              parent.appendChild(fallback);
+            }
           }}
         />
       ) : (

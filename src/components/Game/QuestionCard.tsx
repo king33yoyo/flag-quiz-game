@@ -43,7 +43,6 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
           <FlagDisplay 
             country={question.country}
             size="lg"
-            aspectRatio="auto"
           />
         </div>
       </div>
