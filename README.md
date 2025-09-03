@@ -1,80 +1,158 @@
-# Flag Quiz Game
+# 国旗问答游戏 / Flag Quiz Game
 
-A React-based flag identification quiz game built with TypeScript and Tailwind CSS.
+一个互动式的国旗识别游戏，支持中文和英文双语。测试你对世界各国国旗的了解程度！
 
-## Features
+## 功能特点 / Features
 
-- **Multiple Game Modes**:
-  - Flag Identification: Identify the country from its flag
-  - Country Selection: Choose the correct flag for a country
-  - Timed Challenge: Answer as many as you can in 60 seconds
-  - Survival Mode: Keep going until you get one wrong
+- 🌍 **197个国家和地区** - 覆盖全球所有主要国家
+- 🎮 **多种游戏模式** - 包括国旗识别、国家选择、限时挑战和生存模式
+- 🗺️ **大洲筛选** - 可以选择特定大洲进行练习
+- 🎯 **智能防重复** - 避免短时间内出现重复的国旗
+- 🏳️ **特殊国旗支持** - 包括尼泊尔等非矩形国旗的正确显示
+- 🌐 **双语支持** - 中文和英文界面切换
+- 📱 **响应式设计** - 支持手机、平板和桌面设备
 
-- **Difficulty Levels**:
-  - Easy: 20 major countries
-  - Medium: 50 countries including smaller nations
-  - Hard: All countries worldwide
-  - Expert: Includes historical flags and territories
+## 游戏模式 / Game Modes
 
-- **Scoring System**:
-  - Points based on difficulty
-  - Streak bonuses for consecutive correct answers
-  - Accuracy tracking
+### 1. 国旗识别 / Flag Identification
+- 显示国旗，选择对应的国家
+- 最经典的国旗学习模式
 
-## Tech Stack
+### 2. 国家选择 / Country Selection  
+- 显示国家名称，选择对应的国旗
+- 反向测试模式
 
-- **Frontend**: React 19.1.1 with TypeScript
-- **Styling**: Tailwind CSS
-- **Build Tool**: Vite
-- **State Management**: React Hooks
+### 3. 限时挑战 / Timed Challenge
+- 60秒内回答尽可能多的问题
+- 挑战你的反应速度和知识储备
 
-## Getting Started
+### 4. 生存模式 / Survival Mode
+- 连续答题，直到答错为止
+- 测试你的极限准确率
 
-1. Install dependencies:
-   ```bash
-   npm install
-   ```
+## 技术栈 / Tech Stack
 
-2. Start the development server:
-   ```bash
-   npm run dev
-   ```
+- **前端框架**: React 19.1.1 + TypeScript
+- **构建工具**: Vite 7.1.2
+- **样式**: Tailwind CSS 4.1.12
+- **语言**: 中文、英文
+- **国旗图片**: PNG格式 + SVG emoji支持
 
-3. Open your browser and navigate to `http://localhost:5173`
+## 开始使用 / Getting Started
 
-## Project Structure
+### 环境要求 / Prerequisites
+
+- Node.js >= 18.0.0
+- npm >= 8.0.0
+
+### 安装和运行 / Installation & Running
+
+1. 克隆项目 / Clone the repository
+```bash
+git clone https://github.com/king33yoyo/flag-quiz-game.git
+cd flag-quiz-game
+```
+
+2. 安装依赖 / Install dependencies
+```bash
+npm install
+```
+
+3. 启动开发服务器 / Start development server
+```bash
+npm run dev
+```
+
+4. 构建生产版本 / Build for production
+```bash
+npm run build
+```
+
+5. 预览生产版本 / Preview production build
+```bash
+npm run preview
+```
+
+## 项目结构 / Project Structure
 
 ```
 src/
-├── components/
-│   ├── Game/          # Game-related components
-│   │   ├── GameBoard.tsx
-│   │   ├── QuestionCard.tsx
-│   │   ├── ScoreDisplay.tsx
-│   │   └── Timer.tsx
-│   ├── UI/            # Reusable UI components
-│   │   ├── Button.tsx
-│   │   ├── FlagCard.tsx
-│   │   └── Modal.tsx
-│   └── Layout/        # Layout components
-│       ├── Header.tsx
-│       └── Navigation.tsx
-├── data/
-│   └── countries.ts   # Country and flag data
-├── services/
-│   └── gameService.ts # Game logic service
-├── types/
-│   └── index.ts       # TypeScript type definitions
-└── App.tsx            # Main application component
+├── components/          # React组件
+│   ├── Game/           # 游戏相关组件
+│   │   ├── GameBoard.tsx      # 游戏主面板
+│   │   ├── QuestionCard.tsx   # 问题卡片
+│   │   ├── CountrySelectCard.tsx  # 国家选择卡片
+│   │   ├── ScoreDisplay.tsx    # 分数显示
+│   │   └── Timer.tsx          # 计时器
+│   ├── Layout/         # 布局组件
+│   │   ├── Header.tsx         # 页面头部
+│   │   └── Navigation.tsx     # 导航菜单
+│   └── UI/             # 通用UI组件
+│       ├── Button.tsx         # 按钮组件
+│       ├── Modal.tsx          # 模态框
+│       └── FlagDisplay.tsx    # 国旗显示组件
+├── data/               # 数据文件
+│   └── countries.ts    # 国家数据
+├── services/           # 服务层
+│   ├── gameService.ts  # 游戏逻辑服务
+│   └── soundService.ts # 音效服务
+├── i18n/              # 国际化
+│   ├── translations.ts # 翻译文件
+│   └── index.ts        # i18n配置
+└── types/              # TypeScript类型定义
+    └── index.ts
 ```
 
-## Future Enhancements
+## 游戏规则 / Game Rules
 
-- User authentication and profiles
-- Global leaderboard
-- Achievement system
-- Sound effects and animations
-- Learning mode with country information
-- Mobile app version with React Native
-- Backend API with Node.js and MongoDB
-- Multiplayer mode
+1. **选择游戏模式** - 从4种模式中选择一个
+2. **选择大洲** - 可以选择全球或特定大洲
+3. **开始游戏** - 系统会随机生成问题
+4. **回答问题** - 点击正确的答案
+5. **查看结果** - 系统会显示是否正确并更新分数
+6. **游戏结束** - 根据模式不同，结束条件也不同
+
+## 计分规则 / Scoring
+
+- 基础分数：每题20分
+- 连击奖励：连续答对额外获得5×连击数的分数
+- 不同模式有特殊的计分规则
+
+## 国旗数据 / Flag Data
+
+- 包含197个国家和地区的国旗
+- 每个国家包含：英文名、中文名、国旗图片、所属大洲、人口、面积等信息
+- 特殊国旗（如尼泊尔）有专门的显示优化
+
+## 贡献 / Contributing
+
+欢迎提交Issue和Pull Request来改进这个项目！
+
+1. Fork 本项目
+2. 创建你的特性分支 (`git checkout -b feature/AmazingFeature`)
+3. 提交你的更改 (`git commit -m 'Add some AmazingFeature'`)
+4. 推送到分支 (`git push origin feature/AmazingFeature`)
+5. 创建一个 Pull Request
+
+## 许可证 / License
+
+本项目采用 MIT 许可证 - 查看 [LICENSE](LICENSE) 文件了解详情
+
+## 致谢 / Acknowledgments
+
+- 国旗数据来源于公开数据
+- 感谢所有为国旗识别做出贡献的开发者
+- 特别感谢React、Vite和Tailwind CSS团队
+
+## 版本历史 / Version History
+
+### v1.0.0 (2024-01-XX)
+- 初始版本发布
+- 支持197个国家和地区的国旗
+- 4种游戏模式
+- 中英文双语支持
+- 响应式设计
+
+---
+
+**开始测试你的国旗知识吧！/ Start testing your flag knowledge now!** 🎌

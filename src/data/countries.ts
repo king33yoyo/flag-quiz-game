@@ -4573,6 +4573,7 @@ export const countries: Country[] = [
   {
     "id": "sg",
     "name": "Singapore",
+    "nameZh": "新加坡",
     "flag": "/flags/sg.png",
     "continent": "Asia",
     "subregion": "South-Eastern Asia",
