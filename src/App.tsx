@@ -38,22 +38,13 @@ function AppContent() {
       
       <main className="max-w-7xl mx-auto px-4 py-8">
         {currentGame ? (
-          <div>
-            <div className="mb-4">
-              <button
-                onClick={handleBackToMenu}
-                className="text-blue-600 hover:text-blue-800 font-medium"
-              >
-                {t('app.backToMenu')}
-              </button>
-            </div>
-            <GameBoard
-              mode={currentGame.mode}
-              difficulty={currentGame.difficulty}
-              continent={currentGame.continent}
-              onGameEnd={handleGameEnd}
-            />
-          </div>
+          <GameBoard
+            mode={currentGame.mode}
+            difficulty={currentGame.difficulty}
+            continent={currentGame.continent}
+            onGameEnd={handleGameEnd}
+            onBackToMenu={handleBackToMenu}
+          />
         ) : (
           <div>
             <div className="text-center mb-8">

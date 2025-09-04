@@ -5,10 +5,8 @@ import type { GameQuestion, GameSession, RegionFilter } from '../../types';
 import { QuestionCard } from './QuestionCard';
 import { CountrySelectCard } from './CountrySelectCard';
 import { ScoreDisplay } from './ScoreDisplay';
-import { Timer } from './Timer';
 import { Button } from '../UI/Button';
 import { Modal } from '../UI/Modal';
-import { ErrorBoundary } from '../UI/ErrorBoundary';
 import { GameOverContent } from './GameOverContent';
 import { useI18n } from '../../i18n';
 
@@ -17,6 +15,7 @@ interface GameBoardProps {
   difficulty: GameSession['difficulty'];
   continent: RegionFilter;
   onGameEnd: (session: GameSession) => void;
+  onBackToMenu?: () => void;
 }
 
 export const GameBoard: React.FC<GameBoardProps> = ({
@@ -24,6 +23,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
   difficulty,
   continent,
   onGameEnd,
+  onBackToMenu,
 }) => {
   const [gameService] = useState(() => GameService.getInstance());
   const [session, setSession] = useState<GameSession | null>(null);
@@ -34,6 +34,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
   const [timeLeft, setTimeLeft] = useState(60); // 60 seconds for timed mode
   const { t } = useI18n();
   const isGameEndingRef = useRef(false);
+  const timerRef = useRef<number | null>(null);
   
   const loadNewQuestion = useCallback(() => {
     const question = gameService.generateQuestion();
@@ -54,6 +55,34 @@ export const GameBoard: React.FC<GameBoardProps> = ({
       setTimeLeft(60);
     }
   }, [mode, difficulty, continent, gameService, loadNewQuestion]);
+  
+  // Countdown timer effect for timed mode
+  useEffect(() => {
+    if (mode === 'timed' && !gameOver) {
+      timerRef.current = window.setInterval(() => {
+        setTimeLeft((prev) => {
+          if (prev <= 1) {
+            window.clearInterval(timerRef.current!);
+            return 0;
+          }
+          
+          // Play countdown sound for last 5 seconds
+          if (prev <= 5) {
+            soundService.playCountdown();
+          }
+          
+          return prev - 1;
+        });
+      }, 1000);
+    }
+    
+    return () => {
+      if (timerRef.current) {
+        window.clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
+    };
+  }, [mode, gameOver]);
   
   const handleAnswer = (answerId: string) => {
     if (!currentQuestion || selectedAnswer) return;
@@ -90,12 +119,6 @@ export const GameBoard: React.FC<GameBoardProps> = ({
     }, 2000);
   };
   
-  const handleTimeUp = () => {
-    if (mode === 'timed') {
-      endGame();
-    }
-  };
-  
   const endGame = useCallback(() => {
     // Prevent multiple calls to endGame
     if (isGameEndingRef.current || gameOver) {
@@ -103,6 +126,12 @@ export const GameBoard: React.FC<GameBoardProps> = ({
     }
     
     isGameEndingRef.current = true;
+    
+    // Clean up timer
+    if (timerRef.current) {
+      window.clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
     
     try {
       // Check if game session still exists
@@ -143,6 +172,13 @@ export const GameBoard: React.FC<GameBoardProps> = ({
     }
   }, [gameService, gameOver, session, mode, difficulty, onGameEnd]);
   
+  // Effect to handle timer expiration
+  useEffect(() => {
+    if (mode === 'timed' && timeLeft === 0 && !gameOver) {
+      endGame();
+    }
+  }, [mode, timeLeft, gameOver, endGame]);
+  
   if (!session || !currentQuestion) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -159,35 +195,20 @@ export const GameBoard: React.FC<GameBoardProps> = ({
           {t('app.title')}
         </h1>
         <div className="text-center text-gray-200 text-lg">
-          {t(`gameModes.${mode.replace('-', '')}.title`)} | {t(`difficulty.${difficulty}`)}
+          {t(`gameModes.${mode === 'flag-identify' ? 'flagIdentify' : mode.replace('-', '')}.title`)} | {t(`difficulty.${difficulty}`)}
         </div>
       </div>
       
       {/* Game stats */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-        <ScoreDisplay
-          score={session.score}
-          correctAnswers={session.correctAnswers}
-          totalQuestions={session.totalQuestions}
-          streak={session.streak}
-        />
-        {mode === 'timed' && (
-          <ErrorBoundary fallback={
-            <div className="card text-center">
-              <div className="text-3xl font-bold text-red-600">
-                00:00
-              </div>
-              <div className="text-sm text-gray-600 mt-1">Timer Error</div>
-            </div>
-          }>
-            <Timer
-              initialTime={timeLeft}
-              onTimeUp={handleTimeUp}
-              isActive={!gameOver}
-            />
-          </ErrorBoundary>
-        )}
-      </div>
+      <ScoreDisplay
+        score={session.score}
+        correctAnswers={session.correctAnswers}
+        totalQuestions={session.totalQuestions}
+        streak={session.streak}
+        onBack={onBackToMenu}
+        mode={mode}
+        timeLeft={timeLeft}
+      />
       
       {/* Question */}
       {!gameOver && (mode === 'country-select' ? (

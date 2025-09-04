@@ -32,16 +32,15 @@ export const FlagDisplay: React.FC<FlagDisplayProps> = ({
 
   const config = sizeConfig[size];
   
-  // Special handling for Nepal's unique flag - just add extra padding
+  // Special handling for flags that need scaling
   const isNepal = country.id === 'np';
-  const nepalPadding = isNepal ? 'p-3' : '';
+  const isSpecialFlag = isNepal;
   
   // Base classes with consistent styling
   const baseClasses = `
     ${config.container}
-    ${nepalPadding}
     flex items-center justify-center
-    bg-white border-2 border-gray-300 rounded-lg
+    flag-display border-2 rounded-lg
     overflow-hidden
     ${className}
   `.trim();
@@ -52,7 +51,12 @@ export const FlagDisplay: React.FC<FlagDisplayProps> = ({
         <img 
           src={country.flag} 
           alt={`${country.name} flag`}
-          className={config.image}
+          className={`${config.image} ${isSpecialFlag ? 'scale-75 p-1' : ''}`}
+          style={isSpecialFlag ? { 
+            transformOrigin: 'center',
+            maxWidth: '90%',
+            maxHeight: '90%'
+          } : {}}
           onError={(e) => {
             // Fallback to emoji if image fails to load
             const target = e.target as HTMLImageElement;
@@ -67,7 +71,7 @@ export const FlagDisplay: React.FC<FlagDisplayProps> = ({
           }}
         />
       ) : (
-        <span className={`${config.emoji} leading-none`}>
+        <span className={`${config.emoji} leading-none ${isSpecialFlag ? 'scale-90' : ''}`}>
           {country.flag}
         </span>
       )}

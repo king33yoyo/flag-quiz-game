@@ -7,6 +7,11 @@ export class StorageService {
   // Save leaderboard entry
   static saveLeaderboardEntry(entry: LeaderboardEntry): void {
     try {
+      // Only save challenge and timed modes
+      if (entry.mode !== 'challenge' && entry.mode !== 'timed') {
+        return;
+      }
+      
       const leaderboard = this.getLeaderboard();
       
       // Add new entry
@@ -91,6 +96,11 @@ export class StorageService {
 
   // Check if score qualifies for leaderboard
   static isHighScore(score: number, mode: GameSession['mode'] = 'challenge'): boolean {
+    // Only challenge and timed modes qualify for leaderboard
+    if (mode !== 'challenge' && mode !== 'timed') {
+      return false;
+    }
+    
     const leaderboard = this.getLeaderboard()
       .filter(entry => entry.mode === mode)
       .sort((a, b) => b.score - a.score);

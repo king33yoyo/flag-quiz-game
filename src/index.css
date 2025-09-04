@@ -760,3 +760,10 @@ nav.card {
     transform: translate(200px, 200px);
   }
 }
+
+/* Flag display styling with light purple background */
+.flag-display {
+  background: linear-gradient(135deg, #f3e8ff 0%, #e9d5ff 100%);
+  border-color: #c084fc !important;
+  box-shadow: 0 4px 6px -1px rgba(168, 85, 247, 0.1), 0 2px 4px -1px rgba(168, 85, 247, 0.06);
+}
