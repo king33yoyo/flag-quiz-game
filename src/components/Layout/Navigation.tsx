@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { GameSession, RegionFilter } from '../../types';
 import { Button } from '../UI/Button';
 import { useI18n } from '../../i18n';
@@ -13,6 +13,28 @@ export const Navigation: React.FC<NavigationProps> = ({
 }) => {
   const { t } = useI18n();
   const [selectedContinent, setSelectedContinent] = useState<RegionFilter>('World');
+
+  // Load last selected continent from localStorage
+  useEffect(() => {
+    try {
+      const savedContinent = localStorage.getItem('lastSelectedContinent');
+      if (savedContinent && ['World', ...getContinents()].includes(savedContinent)) {
+        setSelectedContinent(savedContinent as RegionFilter);
+      }
+    } catch (error) {
+      console.error('Error loading saved continent:', error);
+    }
+  }, []);
+
+  // Save selected continent to localStorage when it changes
+  const handleContinentChange = (continent: RegionFilter) => {
+    setSelectedContinent(continent);
+    try {
+      localStorage.setItem('lastSelectedContinent', continent);
+    } catch (error) {
+      console.error('Error saving continent:', error);
+    }
+  };
   
   const gameModes: { id: GameSession['mode']; labelKey: string; descriptionKey: string }[] = [
     { id: 'flag-identify', labelKey: 'gameModes.flagIdentify.title', descriptionKey: 'gameModes.flagIdentify.description' },
@@ -30,13 +52,28 @@ export const Navigation: React.FC<NavigationProps> = ({
       {/* Continent Selection */}
       <div className="mb-6">
         <h3 className="text-lg font-medium text-gray-700 mb-3">{t('continent.select')}</h3>
-        <div className="flex flex-wrap gap-4">
+        <div className="hidden md:flex flex-wrap gap-1 justify-center">
           {['World', ...getContinents()].map((continent) => (
             <Button
               key={continent}
               variant={selectedContinent === continent ? 'primary' : 'secondary'}
               size="sm"
-              onClick={() => setSelectedContinent(continent as RegionFilter)}
+              onClick={() => handleContinentChange(continent as RegionFilter)}
+            >
+              {t(`continent.${continent.toLowerCase()}`)}
+            </Button>
+          ))}
+        </div>
+        
+        {/* Mobile vertical layout */}
+        <div className="flex md:hidden gap-2 justify-center overflow-x-auto py-2">
+          {['World', ...getContinents()].map((continent) => (
+            <Button
+              key={continent}
+              variant={selectedContinent === continent ? 'primary' : 'secondary'}
+              size="sm"
+              mobileVertical={true}
+              onClick={() => handleContinentChange(continent as RegionFilter)}
             >
               {t(`continent.${continent.toLowerCase()}`)}
             </Button>

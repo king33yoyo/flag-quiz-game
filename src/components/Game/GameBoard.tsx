@@ -188,7 +188,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
   }
   
   return (
-    <div className="max-w-4xl mx-auto p-4 game-board">
+    <div className="w-full max-w-7xl mx-auto px-4 py-8 game-board mobile-game-container">
       {/* Game header */}
       <div className="mb-6 animate-fadeIn">
         <h1 className="text-4xl font-bold text-center text-white mb-2 text-shadow-lg">

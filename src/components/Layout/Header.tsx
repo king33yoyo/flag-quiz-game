@@ -5,12 +5,10 @@ import { useI18n } from '../../i18n';
 import { soundService } from '../../services/soundService';
 
 interface HeaderProps {
-  title?: string;
   onShowLeaderboard?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
-  title,
   onShowLeaderboard,
 }) => {
   const { language, setLanguage, t } = useI18n();
@@ -33,15 +31,13 @@ export const Header: React.FC<HeaderProps> = ({
   return (
     <header>
       <div className="max-w-7xl mx-auto px-4">
-        <div className="flex justify-between items-center h-16">
-          <h1 className="text-2xl font-bold text-gray-900">
-            {title || t('app.title')}
-          </h1>
-          <div className="flex items-center space-x-4">
+        <div className="flex justify-between items-center h-16 w-full">
+          <div className="flex items-center space-x-3 ml-auto">
             <Button 
-              variant="secondary" 
+              variant="outline" 
               size="sm"
               onClick={onShowLeaderboard}
+              className="px-3 py-1 text-sm"
             >
               {t('header.leaderboard')}
             </Button>
@@ -49,7 +45,7 @@ export const Header: React.FC<HeaderProps> = ({
               variant="outline"
               size="sm"
               onClick={toggleSound}
-              className="flex items-center space-x-1"
+              className="px-3 py-1 text-sm flex items-center justify-center"
             >
               <span>{soundEnabled ? '🔊' : '🔇'}</span>
             </Button>
@@ -57,9 +53,9 @@ export const Header: React.FC<HeaderProps> = ({
               variant="outline"
               size="sm"
               onClick={toggleLanguage}
-              className="flex items-center space-x-1"
+              className="px-3 py-1 text-sm flex items-center justify-center"
             >
-              <span>{language === 'en' ? '🇨🇳 中文' : '🇺🇸 EN'}</span>
+              <span>{language === 'en' ? '🇨🇳' : '🇺🇸'}</span>
             </Button>
           </div>
         </div>

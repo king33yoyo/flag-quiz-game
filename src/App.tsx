@@ -48,10 +48,10 @@ function AppContent() {
         ) : (
           <div>
             <div className="text-center mb-8">
-              <h2 className="text-4xl font-bold text-gray-900 mb-2">
+              <h2 className="text-3xl font-bold text-white mb-2">
                 {t('app.welcome')}
               </h2>
-              <p className="text-lg text-gray-600">
+              <p className="text-base text-white">
                 {t('app.subtitle')}
               </p>
             </div>
