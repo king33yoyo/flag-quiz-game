@@ -9,15 +9,13 @@ class SoundService {
   }
 
   private initializeSounds() {
-    // These would be actual sound files in a real implementation
-    // For now, we'll use placeholder URLs or create simple sounds with Web Audio API
-    
+    // Initialize with empty audio objects - fallback sounds will be created
     this.sounds = {
-      correct: new Audio('/sounds/correct.mp3'),
-      wrong: new Audio('/sounds/wrong.mp3'),
-      click: new Audio('/sounds/click.mp3'),
-      gameOver: new Audio('/sounds/game-over.mp3'),
-      countdown: new Audio('/sounds/countdown.mp3'),
+      correct: new Audio(),
+      wrong: new Audio(),
+      click: new Audio(),
+      gameOver: new Audio(),
+      countdown: new Audio(),
     };
 
     // Set volume for all sounds
@@ -25,15 +23,16 @@ class SoundService {
       sound.volume = this.volume;
     });
 
-    // If sound files don't exist, create simple beep sounds
+    // Create simple beep sounds as fallback
     this.createFallbackSounds();
   }
 
   private createFallbackSounds() {
     // Create simple beep sounds using Web Audio API as fallback
-    const AudioContextClass = window.AudioContext || (window as Window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
-    if (!AudioContextClass) return;
-    const audioContext = new AudioContextClass();
+    try {
+      const AudioContextClass = window.AudioContext || (window as Window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+      if (!AudioContextClass) return;
+      const audioContext = new AudioContextClass();
     
     // Simple beep function
     const createBeep = (frequency: number, duration: number) => {
@@ -63,6 +62,15 @@ class SoundService {
     this.playClick = createBeep(800, 50); // High beep
     this.playGameOver = createBeep(110, 500); // Low A2 note
     this.playCountdown = createBeep(440, 100); // A4 note
+    } catch (error) {
+      console.warn('Failed to create fallback sounds:', error);
+      // Create silent fallback methods
+      this.playCorrect = () => {};
+      this.playWrong = () => {};
+      this.playClick = () => {};
+      this.playGameOver = () => {};
+      this.playCountdown = () => {};
+    }
   }
 
   playSound(soundName: string) {

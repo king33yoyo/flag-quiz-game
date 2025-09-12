@@ -17,6 +17,9 @@ export const FlagCard: React.FC<FlagCardProps> = ({
   showName = false,
   size = 'md',
 }) => {
+  // 检测是否为尼泊尔国旗
+  const isNepal = country.id === 'np';
+  
   const sizeStyles = {
     sm: 'w-16 h-12 text-2xl',
     md: 'w-24 h-16 text-4xl',
@@ -38,15 +41,20 @@ export const FlagCard: React.FC<FlagCardProps> = ({
       onClick={disabled ? undefined : onClick}
       className={containerStyles}
     >
-      <div className="text-center leading-none">
+      <div className="text-center leading-none w-full h-full flex items-center justify-center">
         {country.flag.startsWith('/flags/') ? (
           <img 
             src={country.flag} 
             alt={`${country.name} flag`}
-            className="w-full h-full object-contain"
+            className={`w-full h-full object-contain ${isNepal ? 'scale-75 p-1' : ''}`}
+            style={isNepal ? { 
+              transformOrigin: 'center',
+              maxWidth: '50%',
+              maxHeight: '100%'
+            } : {}}
           />
         ) : (
-          <span>{country.flag}</span>
+          <span className={`leading-none ${isNepal ? 'text-xs scale-90' : 'text-sm'}`}>{country.flag}</span>
         )}
       </div>
       {showName && (

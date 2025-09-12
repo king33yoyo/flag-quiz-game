@@ -66,3 +66,4 @@ Currently configured with Tailwind CSS v4 but experiencing PostCSS compatibility
 - ESLint configuration includes React-specific rules
 - No test framework currently configured
 - Production build creates optimized assets in `dist/` folder
+- 当需要git操作的时候调用git-version-manager。

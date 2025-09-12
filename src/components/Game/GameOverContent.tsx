@@ -10,6 +10,7 @@ interface GameOverContentProps {
   difficulty: GameSession['difficulty'];
   continent: RegionFilter;
   onPlayAgain: () => void;
+  challengeSuccess?: boolean;
 }
 
 export const GameOverContent: React.FC<GameOverContentProps> = ({
@@ -18,8 +19,9 @@ export const GameOverContent: React.FC<GameOverContentProps> = ({
   difficulty,
   continent,
   onPlayAgain,
+  challengeSuccess = false,
 }) => {
-  const { t } = useI18n();
+  const { t, tWithParams } = useI18n();
   const [playerName, setPlayerName] = useState('');
   const [showNameInput, setShowNameInput] = useState(false);
   const [isHighScore, setIsHighScore] = useState(false);
@@ -65,25 +67,52 @@ export const GameOverContent: React.FC<GameOverContentProps> = ({
 
   return (
     <div className="text-center">
-      {/* Score Display */}
-      <div className="mb-6">
-        <div className="text-5xl font-bold text-gradient mb-2 animate-scaleIn">
-          {session.score}
+      {/* Challenge Success Display */}
+      {challengeSuccess && (
+        <div className="mb-6">
+          <div className="text-4xl font-bold text-green-600 mb-2 animate-scaleIn">
+            {t('gameOver.challengeSuccess')}
+          </div>
+          <div className="text-lg text-gray-700 mb-4">
+            {tWithParams('gameOver.challengeSuccessDesc', { 
+              region: t(`continent.${continent.toLowerCase()}`) 
+            })}
+          </div>
+          {session.challengeProgress && (
+            <div className="text-lg font-semibold text-blue-600 mb-2">
+              {tWithParams('gameOver.countriesCompleted', { 
+                completed: session.challengeProgress.usedCountries.toString(),
+                total: session.challengeProgress.totalCountries.toString() 
+              })}
+            </div>
+          )}
+          <div className="text-2xl font-bold text-yellow-600 mb-2">
+            {t('gameOver.perfectScore')}
+          </div>
         </div>
-        <div className="text-gray-600">{t('stats.finalScore')}</div>
-        
-        {isHighScore && !saved && (
-          <div className="mt-2 text-yellow-600 font-semibold animate-pulse">
-            🏆 New High Score! 🏆
+      )}
+
+      {/* Regular Game Over Display */}
+      {!challengeSuccess && (
+        <div className="mb-6">
+          <div className="text-5xl font-bold text-gradient mb-2 animate-scaleIn">
+            {session.score}
           </div>
-        )}
-        
-        {saved && (
-          <div className="mt-2 text-green-600 font-semibold animate-fadeIn">
-            ✓ Saved to Leaderboard!
-          </div>
-        )}
-      </div>
+          <div className="text-gray-600">{t('stats.finalScore')}</div>
+          
+          {isHighScore && !saved && (
+            <div className="mt-2 text-yellow-600 font-semibold animate-pulse">
+              🏆 New High Score! 🏆
+            </div>
+          )}
+          
+          {saved && (
+            <div className="mt-2 text-green-600 font-semibold animate-fadeIn">
+              ✓ Saved to Leaderboard!
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Stats Grid */}
       <div className="grid grid-cols-2 gap-4 mb-6">

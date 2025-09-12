@@ -6,10 +6,12 @@ import { soundService } from '../../services/soundService';
 
 interface HeaderProps {
   onShowLeaderboard?: () => void;
+  onShowFlagLibrary?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
   onShowLeaderboard,
+  onShowFlagLibrary,
 }) => {
   const { language, setLanguage, t } = useI18n();
   const [soundEnabled, setSoundEnabled] = useState(true);
@@ -29,10 +31,18 @@ export const Header: React.FC<HeaderProps> = ({
   };
 
   return (
-    <header>
+    <header className="relative z-20">
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex justify-between items-center h-16 w-full">
           <div className="flex items-center space-x-3 ml-auto">
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={onShowFlagLibrary}
+              className="px-3 py-1 text-sm"
+            >
+              🚩 {t('header.flagLibrary')}
+            </Button>
             <Button 
               variant="outline" 
               size="sm"

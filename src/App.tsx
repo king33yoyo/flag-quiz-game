@@ -5,6 +5,7 @@ import { Header } from './components/Layout/Header';
 import { Navigation } from './components/Layout/Navigation';
 import { GameBoard } from './components/Game/GameBoard';
 import { Leaderboard } from './components/Leaderboard/Leaderboard';
+import { FlagLibrary } from './components/FlagLibrary/FlagLibrary';
 
 /**
  * App 根组件，负责路由与游戏启动/结束的顶层状态管理
@@ -16,6 +17,7 @@ function AppContent() {
     continent: RegionFilter;
   } | null>(null);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
+  const [showFlagLibrary, setShowFlagLibrary] = useState(false);
 
   const { t } = useI18n();
 
@@ -33,10 +35,13 @@ function AppContent() {
   };
 
   return (
-    <div className="min-h-screen relative" style={{ zIndex: 2 }}>
-      <Header onShowLeaderboard={() => setShowLeaderboard(true)} />
+    <div className="min-h-screen relative">
+      <Header 
+        onShowLeaderboard={() => setShowLeaderboard(true)}
+        onShowFlagLibrary={() => setShowFlagLibrary(true)}
+      />
       
-      <main className="max-w-7xl mx-auto px-4 py-8">
+      <main className="max-w-7xl mx-auto px-4 py-8 relative z-10">
         {currentGame ? (
           <GameBoard
             mode={currentGame.mode}
@@ -64,6 +69,12 @@ function AppContent() {
       <Leaderboard 
         isOpen={showLeaderboard}
         onClose={() => setShowLeaderboard(false)}
+      />
+      
+      {/* Flag Library Modal */}
+      <FlagLibrary 
+        isOpen={showFlagLibrary}
+        onClose={() => setShowFlagLibrary(false)}
       />
     </div>
   );

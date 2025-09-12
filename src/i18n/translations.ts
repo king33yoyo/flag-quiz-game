@@ -23,8 +23,8 @@ export const translations = {
         description: "Answer as many as you can in 60 seconds"
       },
       challenge: {
-        title: "Survival Mode",
-        description: "Keep going until you get one wrong"
+        title: "Challenge Mode",
+        description: "Answer all countries in selected region without mistakes"
       }
     },
     
@@ -60,6 +60,7 @@ export const translations = {
     // Header
     header: {
       leaderboard: "Leaderboard",
+      flagLibrary: "Flag Library",
       profile: "Profile"
     },
     
@@ -78,7 +79,48 @@ export const translations = {
     
     // Game Over
     gameOver: {
-      title: "Game Over!"
+      title: "Game Over!",
+      challengeSuccess: "Challenge Complete! 🎉",
+      challengeSuccessDesc: "You've mastered all countries in {region}!",
+      perfectScore: "Perfect Score!",
+      countriesCompleted: "Countries Completed: {completed}/{total}"
+    },
+
+    // Flag Library
+    flagLibrary: {
+      title: "Flag Library",
+      searchPlaceholder: "Search countries by name or capital...",
+      toggleNames: "Show/Hide Names",
+      stats: "Showing {displayed} of {total} countries in {continent}",
+      tip: "💡 Tip: Click on any flag to view detailed information",
+      noSearchResults: "No countries found matching your search",
+      noCountries: "No countries available for this region"
+    },
+
+    // Country Detail
+    countryDetail: {
+      basicInfo: "Basic Information",
+      statistics: "Statistics",
+      additionalInfo: "Additional Information",
+      location: "Location",
+      neighbours: "Neighboring Countries",
+      capital: "Capital",
+      continent: "Continent",
+      subregion: "Subregion",
+      difficulty: "Difficulty",
+      population: "Population",
+      area: "Area",
+      landlocked: "Landlocked",
+      independent: "Independent",
+      languages: "Languages",
+      currency: "Currency",
+      coordinates: "Coordinates",
+      neighbouringCountries: "neighboring countries"
+    },
+
+    // Common
+    common: {
+      close: "Close"
     }
   },
   
@@ -106,8 +148,8 @@ export const translations = {
         description: "在60秒内回答尽可能多的问题"
       },
       challenge: {
-        title: "生存模式",
-        description: "连续答题，直到答错为止"
+        title: "挑战模式",
+        description: "答对选定地区的所有国家，一题不错"
       }
     },
     
@@ -143,6 +185,7 @@ export const translations = {
     // Header
     header: {
       leaderboard: "排行榜",
+      flagLibrary: "国旗库",
       profile: "个人资料"
     },
     
@@ -161,7 +204,48 @@ export const translations = {
     
     // Game Over
     gameOver: {
-      title: "游戏结束！"
+      title: "游戏结束！",
+      challengeSuccess: "挑战完成！🎉",
+      challengeSuccessDesc: "你已经掌握了{region}的所有国家！",
+      perfectScore: "完美得分！",
+      countriesCompleted: "完成国家: {completed}/{total}"
+    },
+
+    // Flag Library
+    flagLibrary: {
+      title: "国旗库",
+      searchPlaceholder: "搜索国家名称或首都...",
+      toggleNames: "显示/隐藏名称",
+      stats: "显示{continent}的{displayed}/{total}个国家",
+      tip: "",
+      noSearchResults: "未找到匹配的国家",
+      noCountries: "该地区暂无国家"
+    },
+
+    // Country Detail
+    countryDetail: {
+      basicInfo: "基本信息",
+      statistics: "统计数据",
+      additionalInfo: "额外信息",
+      location: "地理位置",
+      neighbours: "邻国",
+      capital: "首都",
+      continent: "大洲",
+      subregion: "子区域",
+      difficulty: "难度",
+      population: "人口",
+      area: "面积",
+      landlocked: "内陆国",
+      independent: "主权国家",
+      languages: "官方语言",
+      currency: "货币",
+      coordinates: "坐标",
+      neighbouringCountries: "个邻国"
+    },
+
+    // Common
+    common: {
+      close: "关闭"
     }
   }
 } as const;

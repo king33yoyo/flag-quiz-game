@@ -31,30 +31,119 @@ export const GameBoard: React.FC<GameBoardProps> = ({
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [showResult, setShowResult] = useState(false);
   const [gameOver, setGameOver] = useState(false);
+  const [challengeCompleted, setChallengeCompleted] = useState(false);
   const [timeLeft, setTimeLeft] = useState(60); // 60 seconds for timed mode
   const { t } = useI18n();
   const isGameEndingRef = useRef(false);
   const timerRef = useRef<number | null>(null);
   
+  const endGame = useCallback((isChallengeSuccess = false) => {
+    // Prevent multiple calls to endGame
+    if (isGameEndingRef.current || gameOver) {
+      return;
+    }
+    
+    isGameEndingRef.current = true;
+    
+    // Clean up timer
+    if (timerRef.current) {
+      window.clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
+    
+    try {
+      // Check if game session still exists
+      if (gameService['session']) {
+        const finalSession = gameService.endGame();
+        // 为挑战成功添加特殊标记
+        const enhancedSession = {
+          ...finalSession,
+          challengeSuccess: isChallengeSuccess,
+          challengeProgress: isChallengeSuccess ? gameService.getChallengeProgress() : undefined,
+        };
+        setSession(enhancedSession);
+        setGameOver(true);
+        onGameEnd(enhancedSession);
+      } else {
+        // Fallback: create a session from current state
+        const fallbackSession: GameSession = {
+          id: `session-${Date.now()}`,
+          userId: 'demo-user',
+          mode,
+          difficulty,
+          score: session?.score || 0,
+          correctAnswers: session?.correctAnswers || 0,
+          totalQuestions: session?.totalQuestions || 0,
+          startTime: session?.startTime || new Date(),
+          endTime: new Date(),
+          streak: session?.streak || 0,
+          challengeSuccess: isChallengeSuccess,
+          challengeProgress: isChallengeSuccess ? gameService.getChallengeProgress() : undefined,
+        };
+        setSession(fallbackSession);
+        setGameOver(true);
+        onGameEnd(fallbackSession);
+      }
+      
+      // Play game over sound with error handling
+      try {
+        soundService.playGameOver();
+      } catch (soundError) {
+        console.warn('Failed to play game over sound:', soundError);
+      }
+    } catch (error) {
+      console.error('Error ending game:', error);
+      // Ensure game over state is set even if there's an error
+      setGameOver(true);
+    }
+  }, [gameService, gameOver, session, mode, difficulty, onGameEnd]);
+
   const loadNewQuestion = useCallback(() => {
-    const question = gameService.generateQuestion();
-    gameService.setCurrentQuestion(question);
-    setCurrentQuestion(question);
-    setSelectedAnswer(null);
-    setShowResult(false);
-  }, [gameService]);
+    try {
+      const question = gameService.generateQuestion();
+      gameService.setCurrentQuestion(question);
+      setCurrentQuestion(question);
+      setSelectedAnswer(null);
+      setShowResult(false);
+    } catch (error) {
+      if (error instanceof Error && error.message === 'CHALLENGE_COMPLETED') {
+        // 挑战成功完成
+        setChallengeCompleted(true);
+        endGame(true);
+      } else {
+        console.error('Error loading question:', error);
+        endGame();
+      }
+    }
+  }, [gameService, endGame]);
   
   useEffect(() => {
     // Start new game
     const newSession = gameService.startGame(mode, difficulty, continent);
     setSession(newSession);
-    loadNewQuestion();
+    
+    // Load first question
+    try {
+      const question = gameService.generateQuestion();
+      gameService.setCurrentQuestion(question);
+      setCurrentQuestion(question);
+      setSelectedAnswer(null);
+      setShowResult(false);
+    } catch (error) {
+      if (error instanceof Error && error.message === 'CHALLENGE_COMPLETED') {
+        setChallengeCompleted(true);
+        endGame(true);
+      } else {
+        console.error('Error loading question:', error);
+        endGame();
+      }
+    }
     
     // Set timer for timed mode
     if (mode === 'timed') {
       setTimeLeft(60);
     }
-  }, [mode, difficulty, continent, gameService, loadNewQuestion]);
+  }, [mode, difficulty, continent, gameService]);
   
   // Countdown timer effect for timed mode
   useEffect(() => {
@@ -118,59 +207,6 @@ export const GameBoard: React.FC<GameBoardProps> = ({
       }
     }, 2000);
   };
-  
-  const endGame = useCallback(() => {
-    // Prevent multiple calls to endGame
-    if (isGameEndingRef.current || gameOver) {
-      return;
-    }
-    
-    isGameEndingRef.current = true;
-    
-    // Clean up timer
-    if (timerRef.current) {
-      window.clearInterval(timerRef.current);
-      timerRef.current = null;
-    }
-    
-    try {
-      // Check if game session still exists
-      if (gameService['session']) {
-        const finalSession = gameService.endGame();
-        setSession(finalSession);
-        setGameOver(true);
-        onGameEnd(finalSession);
-      } else {
-        // Fallback: create a session from current state
-        const fallbackSession: GameSession = {
-          id: `session-${Date.now()}`,
-          userId: 'demo-user',
-          mode,
-          difficulty,
-          score: session?.score || 0,
-          correctAnswers: session?.correctAnswers || 0,
-          totalQuestions: session?.totalQuestions || 0,
-          startTime: session?.startTime || new Date(),
-          endTime: new Date(),
-          streak: session?.streak || 0,
-        };
-        setSession(fallbackSession);
-        setGameOver(true);
-        onGameEnd(fallbackSession);
-      }
-      
-      // Play game over sound with error handling
-      try {
-        soundService.playGameOver();
-      } catch (soundError) {
-        console.warn('Failed to play game over sound:', soundError);
-      }
-    } catch (error) {
-      console.error('Error ending game:', error);
-      // Ensure game over state is set even if there's an error
-      setGameOver(true);
-    }
-  }, [gameService, gameOver, session, mode, difficulty, onGameEnd]);
   
   // Effect to handle timer expiration
   useEffect(() => {
@@ -251,6 +287,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
           difficulty={difficulty}
           continent={continent}
           onPlayAgain={() => window.location.reload()}
+          challengeSuccess={challengeCompleted}
         />
       </Modal>
     </div>

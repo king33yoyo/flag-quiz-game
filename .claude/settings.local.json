@@ -6,7 +6,12 @@
       "Bash(curl:*)",
       "Bash(npm run build:*)",
       "Bash(git checkout:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Read(//d/code/**)",
+      "Bash(npm run lint)",
+      "Bash(taskkill:*)"
     ],
     "deny": [],
     "ask": []

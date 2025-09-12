@@ -2097,29 +2097,6 @@ export const countries: Country[] = [
     "difficulty": "expert"
   },
   {
-    "id": "cy",
-    "name": "Cyprus",
-    "nameZh": "塞浦路斯",
-    "flag": "/flags/cy.png",
-    "continent": "Europe",
-    "subregion": "Southern Europe",
-    "capital": "Nicosia",
-    "population": 1207361,
-    "area": 9251,
-    "languages": [
-      "Greek",
-      "Turkish"
-    ],
-    "currency": "Euro",
-    "coordinates": [
-      35,
-      33
-    ],
-    "landlocked": false,
-    "independent": true,
-    "difficulty": "expert"
-  },
-  {
     "id": "cz",
     "name": "Czechia",
     "nameZh": "捷克",

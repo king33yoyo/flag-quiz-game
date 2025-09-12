@@ -30,6 +30,15 @@ export interface GameSession {
   streak?: number;
   /** 当前问题，仅在进行中时存在 */
   currentQuestion?: GameQuestion;
+  /** 挑战模式是否成功完成 */
+  challengeSuccess?: boolean;
+  /** 挑战模式进度信息 */
+  challengeProgress?: {
+    totalCountries: number;
+    usedCountries: number;
+    remainingCountries: number;
+    completionPercentage: number;
+  };
 }
 
 export interface User {
