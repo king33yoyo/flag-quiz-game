@@ -13,7 +13,7 @@ export const Header: React.FC<HeaderProps> = ({
   onShowLeaderboard,
   onShowFlagLibrary,
 }) => {
-  const { language, setLanguage, t } = useI18n();
+  const { language, setLanguage } = useI18n();
   const [soundEnabled, setSoundEnabled] = useState(true);
 
   useEffect(() => {
@@ -39,17 +39,17 @@ export const Header: React.FC<HeaderProps> = ({
               variant="outline" 
               size="sm"
               onClick={onShowFlagLibrary}
-              className="px-3 py-1 text-sm"
+              className="px-3 py-1 text-sm flex items-center justify-center"
             >
-              🚩 {t('header.flagLibrary')}
+              🚩
             </Button>
             <Button 
               variant="outline" 
               size="sm"
               onClick={onShowLeaderboard}
-              className="px-3 py-1 text-sm"
+              className="px-3 py-1 text-sm flex items-center justify-center"
             >
-              {t('header.leaderboard')}
+              🏆
             </Button>
             <Button
               variant="outline"

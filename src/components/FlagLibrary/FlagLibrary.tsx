@@ -59,11 +59,8 @@ export const FlagLibrary: React.FC<FlagLibraryProps> = ({
   return (
     <div className="modal-overlay">
       <div className="modal-content max-w-6xl max-h-[90vh] overflow-hidden">
-        {/* 标题栏 */}
-        <div className="flex justify-between items-center p-6 border-b">
-          <h2 className="text-2xl font-bold text-gray-800">
-            🚩 {t('flagLibrary.title')}
-          </h2>
+        {/* 标题栏 - 文字内容已删除 */}
+        <div className="flex justify-end items-center p-6 border-b">
           <Button
             variant="outline"
             size="sm"

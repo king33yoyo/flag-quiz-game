@@ -225,15 +225,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
   
   return (
     <div className="w-full max-w-7xl mx-auto px-4 py-8 game-board mobile-game-container">
-      {/* Game header */}
-      <div className="mb-6 animate-fadeIn">
-        <h1 className="text-4xl font-bold text-center text-white mb-2 text-shadow-lg">
-          {t('app.title')}
-        </h1>
-        <div className="text-center text-gray-200 text-lg">
-          {t(`gameModes.${mode === 'flag-identify' ? 'flagIdentify' : mode.replace('-', '')}.title`)} | {t(`difficulty.${difficulty}`)}
-        </div>
-      </div>
+      {/* Game header - 文字内容已删除 */}
       
       {/* Game stats */}
       <ScoreDisplay

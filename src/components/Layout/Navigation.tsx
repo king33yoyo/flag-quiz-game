@@ -36,11 +36,11 @@ export const Navigation: React.FC<NavigationProps> = ({
     }
   };
   
-  const gameModes: { id: GameSession['mode']; labelKey: string; descriptionKey: string }[] = [
-    { id: 'flag-identify', labelKey: 'gameModes.flagIdentify.title', descriptionKey: 'gameModes.flagIdentify.description' },
-    { id: 'country-select', labelKey: 'gameModes.countrySelect.title', descriptionKey: 'gameModes.countrySelect.description' },
-    { id: 'timed', labelKey: 'gameModes.timed.title', descriptionKey: 'gameModes.timed.description' },
-    { id: 'challenge', labelKey: 'gameModes.challenge.title', descriptionKey: 'gameModes.challenge.description' },
+  const gameModes: { id: GameSession['mode']; labelKey: string; icon: string }[] = [
+    { id: 'flag-identify', labelKey: 'gameModes.flagIdentify.title', icon: '🚩' },
+    { id: 'country-select', labelKey: 'gameModes.countrySelect.title', icon: '🌎' },
+    { id: 'timed', labelKey: 'gameModes.timed.title', icon: '⏱️' },
+    { id: 'challenge', labelKey: 'gameModes.challenge.title', icon: '🏆' },
   ];
   
   // Removed difficulty selection - now uses all countries
@@ -81,22 +81,18 @@ export const Navigation: React.FC<NavigationProps> = ({
         </div>
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+      <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
         {gameModes.map((mode) => (
-          <div
+          <Button
             key={mode.id}
-            className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
+            variant="game-mode"
+            size="game-mode"
+            icon={mode.icon}
+            onClick={() => onStartGame(mode.id, 'expert', selectedContinent)}
+            className="flex flex-col items-center justify-center"
           >
-            <h3 className="font-medium text-gray-900 mb-1">{t(mode.labelKey as keyof typeof import('../../i18n/translations').translations)}</h3>
-            <p className="text-sm text-gray-600 mb-3">{t(mode.descriptionKey as keyof typeof import('../../i18n/translations').translations)}</p>
-            <Button
-              variant="primary"
-              onClick={() => onStartGame(mode.id, 'expert', selectedContinent)}
-              className="w-full"
-            >
-              {t('game.start')}
-            </Button>
-          </div>
+            {t(mode.labelKey as keyof typeof import('../../i18n/translations').translations)}
+          </Button>
         ))}
       </div>
     </nav>

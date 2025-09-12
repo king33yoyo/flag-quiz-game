@@ -61,11 +61,8 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <div className="max-w-4xl w-full max-h-[80vh] overflow-hidden flex flex-col">
-        {/* Header */}
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-3xl font-bold text-gradient">
-            {t('header.leaderboard')}
-          </h2>
+        {/* Header - 文字内容已删除 */}
+        <div className="flex justify-end items-center mb-6">
           <div className="flex space-x-2">
             <Button
               variant="outline"

@@ -84,8 +84,7 @@ export const CountryDetail: React.FC<CountryDetailProps> = ({
         'Lima': '利马',
         'Bogotá': '波哥大',
         'Caracas': '加拉加斯',
-        'Mexico City': '墨西哥城',
-        'Madrid': '马德里'
+        'Mexico City': '墨西哥城'
       };
       return capitalMap[country.capital] || country.capital;
     }
@@ -159,9 +158,9 @@ export const CountryDetail: React.FC<CountryDetailProps> = ({
         'Hong Kong dollar': '港币',
         'Macanese pataca': '澳门币'
       };
-      return currencyMap[country.currency] || country.currency;
+      return currencyMap[country.currency || ''] || country.currency || '';
     }
-    return country.currency;
+    return country.currency || '';
   };
 
   const getSubregionName = () => {
@@ -290,8 +289,7 @@ export const CountryDetail: React.FC<CountryDetailProps> = ({
         'Pashto': '普什图语',
         'Tajik': '塔吉克语',
         'Turkmen': '土库曼语',
-        'Kyrgyz': '吉尔吉斯语',
-        'Kazakh': '哈萨克语'
+        'Kyrgyz': '吉尔吉斯语'
       };
       return languageMap[lang] || lang;
     }
