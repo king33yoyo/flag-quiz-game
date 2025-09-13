@@ -33,12 +33,12 @@ function AppContent() {
   };
 
   return (
-    <div className="min-h-screen relative">
+    <div className="min-h-screen relative mobile-layout">
       <Header 
         onShowFlagLibrary={() => setShowFlagLibrary(true)}
       />
       
-      <main className="max-w-7xl mx-auto px-4 py-8 relative z-10">
+      <main className="max-w-7xl mx-auto px-4 py-8 relative z-10 mobile-main">
         {currentGame ? (
           <GameBoard
             mode={currentGame.mode}
@@ -49,7 +49,7 @@ function AppContent() {
           />
         ) : (
           <div>
-            <div className="text-center mb-8">
+            <div className="text-center mb-8 mobile-title-spacing">
               {/* 主页面标题文字已删除 */}
             </div>
             <Navigation onStartGame={handleStartGame} />

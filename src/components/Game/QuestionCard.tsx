@@ -36,10 +36,10 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
   return (
     <div className="card p-6 question-card">
       <div className="text-center mb-6">
-        <h2 className="text-2xl font-bold text-gray-800 mb-4 animate-fadeIn">
+        <h2 className="text-2xl font-bold text-gray-800 mb-4">
           {t('game.whichCountry')}
         </h2>
-        <div className="flex justify-center animate-scaleIn">
+        <div className="flex justify-center">
           <FlagDisplay 
             country={question.country}
             size="lg"

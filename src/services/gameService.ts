@@ -207,7 +207,7 @@ export class GameService {
     }
     
     // 管理可用国家池
-    let availableCountries = this.manageAvailableCountries(allCountries, isLimitedQuestionMode, isTimedMode);
+    const availableCountries = this.manageAvailableCountries(allCountries, isLimitedQuestionMode, isTimedMode);
     
     if (availableCountries.length === 0) {
       throw new Error('No available countries for question generation');

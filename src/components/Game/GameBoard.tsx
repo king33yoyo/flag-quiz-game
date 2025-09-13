@@ -36,6 +36,12 @@ export const GameBoard: React.FC<GameBoardProps> = ({
   const { t } = useI18n();
   const isGameEndingRef = useRef(false);
   const timerRef = useRef<number | null>(null);
+  const sessionRef = useRef<GameSession | null>(null);
+  
+  // Keep sessionRef in sync with session state
+  useEffect(() => {
+    sessionRef.current = session;
+  }, [session]);
   
   const endGame = useCallback((isChallengeSuccess = false) => {
     // Prevent multiple calls to endGame
@@ -66,17 +72,18 @@ export const GameBoard: React.FC<GameBoardProps> = ({
         onGameEnd(enhancedSession);
       } else {
         // Fallback: create a session from current state
+        const currentSession = sessionRef.current;
         const fallbackSession: GameSession = {
           id: `session-${Date.now()}`,
           userId: 'demo-user',
           mode,
           difficulty,
-          score: session?.score || 0,
-          correctAnswers: session?.correctAnswers || 0,
-          totalQuestions: session?.totalQuestions || 0,
-          startTime: session?.startTime || new Date(),
+          score: currentSession?.score || 0,
+          correctAnswers: currentSession?.correctAnswers || 0,
+          totalQuestions: currentSession?.totalQuestions || 0,
+          startTime: currentSession?.startTime || new Date(),
           endTime: new Date(),
-          streak: session?.streak || 0,
+          streak: currentSession?.streak || 0,
           challengeSuccess: isChallengeSuccess,
           challengeProgress: isChallengeSuccess ? gameService.getChallengeProgress() : undefined,
         };
@@ -96,7 +103,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
       // Ensure game over state is set even if there's an error
       setGameOver(true);
     }
-  }, [gameService, gameOver, session, mode, difficulty, onGameEnd]);
+  }, [gameService, gameOver, mode, difficulty, onGameEnd]);
 
   const loadNewQuestion = useCallback(() => {
     try {
@@ -143,7 +150,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
     if (mode === 'timed') {
       setTimeLeft(60);
     }
-  }, [mode, difficulty, continent, gameService]);
+  }, [mode, difficulty, continent, gameService, endGame]);
   
   // Countdown timer effect for timed mode
   useEffect(() => {
@@ -180,7 +187,14 @@ export const GameBoard: React.FC<GameBoardProps> = ({
     setShowResult(true);
     
     const result = gameService.submitAnswer(currentQuestion.id, answerId);
-    setSession({ ...result.session });
+    
+    // Only update session if score actually changed to prevent unnecessary re-renders
+    setSession(prevSession => {
+      if (!prevSession || prevSession.score !== result.session.score) {
+        return { ...result.session };
+      }
+      return prevSession;
+    });
     
     // Play sound effect
     if (result.isCorrect) {
@@ -199,8 +213,9 @@ export const GameBoard: React.FC<GameBoardProps> = ({
     
     // Load next question after delay
     setTimeout(() => {
+      const currentSession = sessionRef.current;
       // Only end after 10 questions for non-timed and non-challenge modes
-      if (mode !== 'timed' && mode !== 'challenge' && session?.totalQuestions && session.totalQuestions >= 9) {
+      if (mode !== 'timed' && mode !== 'challenge' && currentSession?.totalQuestions && currentSession.totalQuestions >= 9) {
         endGame();
       } else {
         loadNewQuestion();
@@ -279,6 +294,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
       {/* Question */}
       {!gameOver && (mode === 'country-select' ? (
         <CountrySelectCard
+          key={currentQuestion.id}
           question={currentQuestion}
           onAnswer={handleAnswer}
           showResult={showResult}
@@ -287,6 +303,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
         />
       ) : (
         <QuestionCard
+          key={currentQuestion.id}
           question={currentQuestion}
           onAnswer={handleAnswer}
           showResult={showResult}

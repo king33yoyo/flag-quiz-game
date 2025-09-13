@@ -9,11 +9,7 @@ body {
   font-family: system-ui, -apple-system, sans-serif;
   line-height: 1.5;
   color: #333;
-  background: 
-    radial-gradient(circle at 20% 30%, rgba(34, 193, 195, 0.3) 0%, transparent 50%),
-    radial-gradient(circle at 80% 70%, rgba(253, 187, 45, 0.3) 0%, transparent 50%),
-    radial-gradient(circle at 50% 50%, rgba(131, 58, 180, 0.2) 0%, transparent 70%),
-    linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #7e8ba3 100%);
+  background: #ffffff;
   min-height: 100vh;
   position: relative;
   overflow-x: hidden;
@@ -480,6 +476,10 @@ body::before {
   height: 4rem;
 }
 
+.h-24 {
+  height: 6rem;
+}
+
 .h-32 {
   height: 8rem;
 }
@@ -553,7 +553,7 @@ body::before {
 header {
   background-color: white;
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.8);
 }
 
 /* Special flag adjustments */
@@ -726,7 +726,7 @@ header {
 
 /* Question card animations */
 .question-card {
-  animation: slideInUp 0.5s ease-out;
+  /* Removed animation to prevent flag flickering */
 }
 
 .option-card {
@@ -796,37 +796,9 @@ nav.card {
   background-image: radial-gradient(circle at 80% 60%, rgba(255, 193, 7, 0.1) 0%, transparent 50%);
 }
 
-/* Animated background for game board */
+/* Game board background */
 .game-board {
   position: relative;
-}
-
-.game-board::before {
-  content: '';
-  position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: repeating-linear-gradient(
-    45deg,
-    transparent,
-    transparent 100px,
-    rgba(255, 255, 255, 0.02) 100px,
-    rgba(255, 255, 255, 0.02) 200px
-  );
-  animation: drift 30s linear infinite;
-  pointer-events: none;
-  z-index: -1;
-}
-
-@keyframes drift {
-  from {
-    transform: translate(0, 0);
-  }
-  to {
-    transform: translate(200px, 200px);
-  }
 }
 
 /* Flag display styling with light purple background */
@@ -901,7 +873,7 @@ nav.card {
 .game-mode-icon {
   font-size: 3rem;
   line-height: 1;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+  /* Removed drop-shadow filter to prevent rendering issues */
 }
 
 .btn-game-mode-size .game-mode-icon {
@@ -1061,3 +1033,63 @@ nav.card {
     animation-duration: 2.5s;
   }
 }
+
+/* Mobile Layout Optimization Classes */
+.mobile-layout {
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+  position: relative;
+  overflow: hidden;
+}
+
+.mobile-main {
+  padding-top: 2.5rem;
+  padding-bottom: 1rem;
+  min-height: calc(100vh - 5rem);
+  min-height: calc(-webkit-fill-available - 5rem);
+  position: relative;
+  z-index: 10;
+}
+
+.mobile-title-spacing {
+  min-height: 3rem;
+}
+
+/* Enhanced mobile responsive styles */
+@media (max-width: 767px) {
+  .mobile-layout {
+    padding-top: calc(env(safe-area-inset-top) + 1rem);
+    padding-bottom: calc(env(safe-area-inset-bottom) + 0.5rem);
+  }
+  
+  .mobile-main {
+    padding-top: 2rem;
+    padding-bottom: 1rem;
+  }
+  
+  /* Additional safe area support for older devices */
+  @supports not (padding: env(safe-area-inset-top)) {
+    .mobile-layout {
+      padding-top: 1rem;
+      padding-bottom: 1rem;
+    }
+  }
+}
+
+/* Landscape orientation support */
+@media (max-width: 767px) and (orientation: landscape) {
+  .mobile-layout {
+    padding-top: calc(env(safe-area-inset-top) + 0.75rem);
+    padding-bottom: calc(env(safe-area-inset-bottom) + 0.25rem);
+  }
+  
+  .mobile-main {
+    padding-top: 1.5rem;
+    padding-bottom: 0.75rem;
+  }
+}
+
