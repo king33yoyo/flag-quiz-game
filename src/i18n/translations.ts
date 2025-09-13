@@ -41,6 +41,8 @@ export const translations = {
       start: "Start Game",
       endGame: "End Game",
       playAgain: "Play Again",
+      restart: "Restart Game",
+      backToMenu: "Back to Menu",
       timeRemaining: "Time Remaining",
       whichCountry: "Which country does this flag belong to?",
       whichCountryFlag: "Which flag belongs to {country}?",
@@ -59,7 +61,6 @@ export const translations = {
     
     // Header
     header: {
-      leaderboard: "Leaderboard",
       flagLibrary: "Flag Library",
       profile: "Profile"
     },
@@ -83,7 +84,30 @@ export const translations = {
       challengeSuccess: "Challenge Complete! 🎉",
       challengeSuccessDesc: "You've mastered all countries in {region}!",
       perfectScore: "Perfect Score!",
-      countriesCompleted: "Countries Completed: {completed}/{total}"
+      countriesCompleted: "Countries Completed: {completed}/{total}",
+      countriesLearned: "You learned {count} new countries!"
+    },
+
+    // Honorary Titles
+    honoraryTitles: {
+      master: "Flag Master",
+      expert: "Geography Expert",
+      advanced: "Flag Advanced",
+      skilled: "Learning Skilled",
+      progressing: "Keep Progressing",
+      improving: "Keep Improving",
+      beginner: "Beginner"
+    },
+
+    // Encouragement Messages
+    encouragement: {
+      perfect: "Absolutely perfect! You're a true flag master! 🌟",
+      excellent: "Excellent work! Your knowledge of world flags is impressive! 🎯",
+      great: "Great job! You've learned so many countries! 🌟",
+      good: "Good progress! Your geography skills are growing! 💪",
+      keepGoing: "Nice effort! You're building your country knowledge! 📚",
+      practice: "Good start! Every country you learn is an achievement! 🌱",
+      startLearning: "Great beginning! Your world exploration starts now! 🌟"
     },
 
     // Flag Library
@@ -166,6 +190,8 @@ export const translations = {
       start: "开始游戏",
       endGame: "结束游戏",
       playAgain: "再玩一次",
+      restart: "重新开始",
+      backToMenu: "返回首页",
       timeRemaining: "剩余时间",
       whichCountry: "这面国旗属于哪个国家？",
       whichCountryFlag: "{country}的国旗是哪一面？",
@@ -184,7 +210,6 @@ export const translations = {
     
     // Header
     header: {
-      leaderboard: "排行榜",
       flagLibrary: "国旗库",
       profile: "个人资料"
     },
@@ -208,7 +233,30 @@ export const translations = {
       challengeSuccess: "挑战完成！🎉",
       challengeSuccessDesc: "你已经掌握了{region}的所有国家！",
       perfectScore: "完美得分！",
-      countriesCompleted: "完成国家: {completed}/{total}"
+      countriesCompleted: "完成国家: {completed}/{total}",
+      countriesLearned: "你学习了 {count} 个新国家！"
+    },
+
+    // Honorary Titles
+    honoraryTitles: {
+      master: "国旗大师",
+      expert: "地理专家",
+      advanced: "国旗高手",
+      skilled: "学习达人",
+      progressing: "继续努力",
+      improving: "加油进步",
+      beginner: "初学者"
+    },
+
+    // Encouragement Messages
+    encouragement: {
+      perfect: "完美无瑕！你是真正的国旗大师！🌟",
+      excellent: "表现出色！你的国旗知识令人印象深刻！🎯",
+      great: "做得很好！你已经认识了这么多国家！🌟",
+      good: "进步不错！你的地理知识正在增长！💪",
+      keepGoing: "努力不错！你正在积累国家知识！📚",
+      practice: "好的开始！每认识一个国家都是成就！🌱",
+      startLearning: "很好的开端！你的世界探索从现在开始！🌟"
     },
 
     // Flag Library

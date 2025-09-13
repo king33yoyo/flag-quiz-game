@@ -1,75 +1,73 @@
-import { useState, useEffect } from 'react';
 import { Button } from '../UI/Button';
-import { StorageService } from '../../services/storageService';
 import type { GameSession, RegionFilter } from '../../types';
 import { useI18n } from '../../i18n';
 
 interface GameOverContentProps {
   session: GameSession;
-  mode: GameSession['mode'];
-  difficulty: GameSession['difficulty'];
   continent: RegionFilter;
-  onPlayAgain: () => void;
+  onBackToMenu: () => void;
+  onRestartGame: () => void;
   challengeSuccess?: boolean;
 }
 
 export const GameOverContent: React.FC<GameOverContentProps> = ({
   session,
-  mode,
-  difficulty,
   continent,
-  onPlayAgain,
+  onBackToMenu,
+  onRestartGame,
   challengeSuccess = false,
 }) => {
   const { t, tWithParams } = useI18n();
-  const [playerName, setPlayerName] = useState('');
-  const [showNameInput, setShowNameInput] = useState(false);
-  const [isHighScore, setIsHighScore] = useState(false);
-  const [saved, setSaved] = useState(false);
-
-  // Check if this is a high score when component mounts
-  useEffect(() => {
-    const highScore = StorageService.isHighScore(session.score, mode);
-    setIsHighScore(highScore);
-    setShowNameInput(highScore);
-  }, [session.score, mode]);
-
-  const handleSaveScore = () => {
-    if (!playerName.trim()) return;
-
-    const entry = {
-      id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-      playerName: playerName.trim(),
-      score: session.score,
-      correctAnswers: session.correctAnswers,
-      totalQuestions: session.totalQuestions,
-      accuracy: session.totalQuestions > 0 
-        ? (session.correctAnswers / session.totalQuestions) * 100 
-        : 0,
-      streak: session.streak || 0,
-      mode,
-      difficulty,
-      continent,
-      date: new Date(),
-      duration: session.endTime 
-        ? Math.floor((session.endTime.getTime() - session.startTime.getTime()) / 1000)
-        : 0,
-    };
-
-    StorageService.saveLeaderboardEntry(entry);
-    setSaved(true);
-    setShowNameInput(false);
-  };
 
   const accuracy = session.totalQuestions > 0 
     ? Math.round((session.correctAnswers / session.totalQuestions) * 100)
     : 0;
 
+  // 计算学习的国家数量（对于有限题目模式就是题目数，其他模式是正确答案数）
+  const learnedCountries = session.mode === 'flag-identify' || session.mode === 'country-select' 
+    ? session.totalQuestions 
+    : session.correctAnswers;
+
+  // 荣誉称号系统基于准确率
+  const getHonoraryTitle = (accuracy: number) => {
+    if (accuracy === 100) return { title: t('honoraryTitles.master'), emoji: '🏆', color: 'gold' };
+    if (accuracy >= 90) return { title: t('honoraryTitles.expert'), emoji: '🥇', color: 'silver' };
+    if (accuracy >= 80) return { title: t('honoraryTitles.advanced'), emoji: '🥈', color: 'bronze' };
+    if (accuracy >= 70) return { title: t('honoraryTitles.skilled'), emoji: '🥉', color: 'blue' };
+    if (accuracy >= 60) return { title: t('honoraryTitles.progressing'), emoji: '📚', color: 'blue' };
+    if (accuracy >= 50) return { title: t('honoraryTitles.improving'), emoji: '💪', color: 'blue' };
+    return { title: t('honoraryTitles.beginner'), emoji: '🌱', color: 'blue' };
+  };
+
+  // 获取鼓励语基于准确率
+  const getEncouragement = (accuracy: number) => {
+    if (accuracy === 100) return t('encouragement.perfect');
+    if (accuracy >= 90) return t('encouragement.excellent');
+    if (accuracy >= 80) return t('encouragement.great');
+    if (accuracy >= 70) return t('encouragement.good');
+    if (accuracy >= 60) return t('encouragement.keepGoing');
+    if (accuracy >= 50) return t('encouragement.practice');
+    return t('encouragement.startLearning');
+  };
+
+  const honoraryTitle = getHonoraryTitle(accuracy);
+  const encouragement = getEncouragement(accuracy);
+
+  // 获取主题色
+  const getThemeColor = (color: string) => {
+    switch (color) {
+      case 'gold': return '#FFD700';
+      case 'silver': return '#C0C0C0';
+      case 'bronze': return '#CD7F32';
+      default: return '#3B82F6';
+    }
+  };
+
   return (
-    <div className="text-center">
+    <div className="text-center min-h-[400px] flex flex-col justify-center animate-modalScaleIn">
       {/* Challenge Success Display */}
       {challengeSuccess && (
-        <div className="mb-6">
+        <div className="mb-6 animate-challengeSuccess">
           <div className="text-4xl font-bold text-green-600 mb-2 animate-scaleIn">
             {t('gameOver.challengeSuccess')}
           </div>
@@ -94,91 +92,37 @@ export const GameOverContent: React.FC<GameOverContentProps> = ({
 
       {/* Regular Game Over Display */}
       {!challengeSuccess && (
-        <div className="mb-6">
-          <div className="text-5xl font-bold text-gradient mb-2 animate-scaleIn">
-            {session.score}
+        <div className="mb-8">
+          <div className="text-6xl mb-4 animate-emojiBounce">
+            {honoraryTitle.emoji}
           </div>
-          <div className="text-gray-600">{t('stats.finalScore')}</div>
-          
-          {isHighScore && !saved && (
-            <div className="mt-2 text-yellow-600 font-semibold animate-pulse">
-              🏆 New High Score! 🏆
-            </div>
-          )}
-          
-          {saved && (
-            <div className="mt-2 text-green-600 font-semibold animate-fadeIn">
-              ✓ Saved to Leaderboard!
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Stats Grid */}
-      <div className="grid grid-cols-2 gap-4 mb-6">
-        <div className="bg-green-50 p-4 rounded-lg">
-          <div className="text-2xl font-semibold text-green-600">
-            {session.correctAnswers}/{session.totalQuestions}
+          <div className="text-4xl font-bold mb-6 animate-titlePulse" style={{ color: getThemeColor(honoraryTitle.color) }}>
+            {honoraryTitle.title}
           </div>
-          <div className="text-sm text-gray-600">{t('stats.correct')}</div>
-        </div>
-        <div className="bg-purple-50 p-4 rounded-lg">
-          <div className="text-2xl font-semibold text-purple-600">
-            {accuracy}%
+          <div className="text-lg text-gray-600 mb-4">
+            {tWithParams('gameOver.countriesLearned', { count: learnedCountries.toString() })}
           </div>
-          <div className="text-sm text-gray-600">{t('stats.accuracy')}</div>
-        </div>
-        {session.streak && session.streak > 0 && (
-          <div className="bg-orange-50 p-4 rounded-lg col-span-2">
-            <div className="text-2xl font-semibold text-orange-600">
-              🔥 {session.streak}
-            </div>
-            <div className="text-sm text-gray-600">{t('stats.streak')}</div>
-          </div>
-        )}
-      </div>
-
-      {/* Name Input for High Scores */}
-      {showNameInput && (
-        <div className="mb-6 p-4 bg-yellow-50 rounded-lg border-2 border-yellow-200 animate-slideInUp">
-          <div className="mb-3 text-sm font-medium text-gray-700">
-            Enter your name for the leaderboard:
-          </div>
-          <div className="flex space-x-2">
-            <input
-              type="text"
-              value={playerName}
-              onChange={(e) => setPlayerName(e.target.value)}
-              placeholder="Your name"
-              maxLength={20}
-              className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              onKeyPress={(e) => e.key === 'Enter' && handleSaveScore()}
-            />
-            <Button
-              onClick={handleSaveScore}
-              disabled={!playerName.trim()}
-              variant="primary"
-            >
-              Save
-            </Button>
-            <Button
-              onClick={() => setShowNameInput(false)}
-              variant="outline"
-            >
-              Skip
-            </Button>
+          <div className="text-lg text-gray-700 font-medium animate-scaleIn">
+            {encouragement}
           </div>
         </div>
       )}
 
       {/* Action Buttons */}
-      <div className="space-y-2">
+      <div className="grid grid-cols-2 gap-3">
         <Button
-          onClick={onPlayAgain}
-          variant="primary"
-          className="w-full"
+          onClick={onBackToMenu}
+          variant="outline"
+          className="w-full game-over-button"
         >
-          {t('game.playAgain')}
+          {t('game.backToMenu')}
+        </Button>
+        <Button
+          onClick={onRestartGame}
+          variant="primary"
+          className="w-full game-over-button"
+        >
+          {t('game.restart')}
         </Button>
       </div>
     </div>

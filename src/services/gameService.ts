@@ -29,6 +29,9 @@ export class GameService {
     // 如果是挑战模式，初始化专用国家池
     if (mode === 'challenge') {
       this.initializeChallengeModeCountries(continent);
+    } else if (mode === 'flag-identify' || mode === 'country-select') {
+      // 对于有限题目模式，预计算可用的国家数量
+      this.validateCountryPoolForLimitedMode(difficulty, continent);
     }
     
     this.session = {
@@ -56,6 +59,25 @@ export class GameService {
     
     // 其他模式使用原有逻辑
     return this.generateRegularQuestion();
+  }
+  
+  /**
+   * 验证有限题目模式的国家池
+   */
+  private validateCountryPoolForLimitedMode(difficulty: GameSession['difficulty'], continent: RegionFilter): void {
+    let allCountries: Country[] = [];
+    
+    if (continent === 'World') {
+      allCountries = getRandomCountries(1000, difficulty);
+    } else {
+      allCountries = getCountriesByContinent(continent)
+        .filter(c => this.isDifficultyMatch(c.difficulty, difficulty));
+    }
+    
+    // 确保有足够的独特国家（至少需要40个，因为每个问题需要4个不同国家）
+    if (allCountries.length < 40) {
+      console.warn(`Warning: Only ${allCountries.length} countries available for ${continent} ${difficulty} mode. Some repetition may occur.`);
+    }
   }
   
   /**
@@ -163,93 +185,41 @@ export class GameService {
   }
   
   /**
-   * 生成常规模式的问题（原有逻辑）
+   * 生成常规模式的问题（改进的防重复逻辑）
    */
   private generateRegularQuestion(): GameQuestion {
     if (!this.session) {
       throw new Error('No active game session');
     }
     
-    // Get countries based on continent (no difficulty filtering)
+    // 根据游戏模式决定防重复策略
+    const isLimitedQuestionMode = this.session.mode === 'flag-identify' || this.session.mode === 'country-select';
+    const isTimedMode = this.session.mode === 'timed';
+    
+    // Get countries based on continent and difficulty
     let allCountries: Country[] = [];
     
     if (this.selectedContinent === 'World') {
-      // Get all countries from all continents
-      allCountries = getRandomCountries(1000, 'expert'); // Get a large sample
+      allCountries = getRandomCountries(1000, this.session!.difficulty);
     } else {
-      // Get countries from specific continent
-      allCountries = getCountriesByContinent(this.selectedContinent);
+      allCountries = getCountriesByContinent(this.selectedContinent)
+        .filter(c => this.isDifficultyMatch(c.difficulty, this.session!.difficulty));
     }
     
-    // Filter out already used countries to avoid repetition
-    let availableCountries = allCountries.filter(c => !this.usedCountryIds.has(c.id));
+    // 管理可用国家池
+    let availableCountries = this.manageAvailableCountries(allCountries, isLimitedQuestionMode, isTimedMode);
     
-    // If we don't have enough unused countries, clear some old ones
-    if (availableCountries.length < 4) {
-      // Keep only the last 20 used countries to avoid overwhelming repetition
-      const usedArray = Array.from(this.usedCountryIds);
-      if (usedArray.length > 20) {
-        const toRemove = usedArray.slice(0, usedArray.length - 20);
-        toRemove.forEach(id => this.usedCountryIds.delete(id));
-        availableCountries = allCountries.filter(c => !this.usedCountryIds.has(c.id));
-      }
-      
-      // If still not enough, clear all but the last 10
-      if (availableCountries.length < 4) {
-        this.usedCountryIds.clear();
-        // Add back the most recent 10 countries if they exist
-        const recentCountries = usedArray.slice(-10);
-        recentCountries.forEach(id => {
-          const country = allCountries.find(c => c.id === id);
-          if (country) this.usedCountryIds.add(id);
-        });
-        availableCountries = allCountries.filter(c => !this.usedCountryIds.has(c.id));
-      }
-    }
-    
-    const finalAvailableCountries = availableCountries;
-    
-    if (finalAvailableCountries.length === 0) {
+    if (availableCountries.length === 0) {
       throw new Error('No available countries for question generation');
     }
     
-    // Select correct answer from available countries
-    const correctCountry = finalAvailableCountries[Math.floor(Math.random() * finalAvailableCountries.length)];
+    // 选择正确答案
+    const correctCountry = availableCountries[Math.floor(Math.random() * availableCountries.length)];
     
-    // Select 3 wrong answers from available countries (excluding used ones and correct answer)
-    let wrongCountries: Country[] = [];
+    // 选择错误答案（确保不重复）
+    const wrongCountries = this.selectWrongAnswers(availableCountries, correctCountry);
     
-    if (this.selectedContinent === 'World') {
-      // For world mode, wrong answers from available countries
-      const availableForWrong = finalAvailableCountries.filter(c => c.id !== correctCountry.id);
-      wrongCountries = availableForWrong
-        .sort(() => 0.5 - Math.random())
-        .slice(0, 3);
-    } else {
-      // For continent mode, ensure wrong answers are from the same continent
-      const continentCountries = getCountriesByContinent(this.selectedContinent);
-      const sameContinentAvailable = continentCountries.filter(country => 
-        country.id !== correctCountry.id &&
-        !this.usedCountryIds.has(country.id)
-      );
-      
-      if (sameContinentAvailable.length >= 3) {
-        wrongCountries = sameContinentAvailable
-          .sort(() => 0.5 - Math.random())
-          .slice(0, 3);
-      } else {
-        // Fallback: if not enough countries in continent, use other available countries
-        const remainingNeeded = 3 - sameContinentAvailable.length;
-        const otherAvailable = finalAvailableCountries
-          .filter(c => c.id !== correctCountry.id && !sameContinentAvailable.find(sc => sc.id === c.id))
-          .sort(() => 0.5 - Math.random())
-          .slice(0, remainingNeeded);
-        
-        wrongCountries = [...sameContinentAvailable, ...otherAvailable];
-      }
-    }
-    
-    // Combine and shuffle options
+    // 组合并打乱选项
     const options = [correctCountry, ...wrongCountries]
       .sort(() => 0.5 - Math.random());
     
@@ -260,16 +230,147 @@ export class GameService {
       correctAnswer: correctCountry.id,
     };
     
-    // Mark all used countries to avoid repetition
-    this.usedCountryIds.add(correctCountry.id);
-    wrongCountries.forEach(country => this.usedCountryIds.add(country.id));
+    // 标记使用的国家
+    this.markUsedCountries([correctCountry, ...wrongCountries], isLimitedQuestionMode);
     
-    // 更新会话中的 currentQuestion 便于结果判定
+    // 更新会话中的当前问题
     this.currentQuestion = question;
     if (this.session) {
       this.session.currentQuestion = question;
     }
     return question;
+  }
+  
+  /**
+   * 检查难度匹配
+   */
+  private isDifficultyMatch(countryDifficulty: string, gameDifficulty: string): boolean {
+    if (gameDifficulty === 'expert') return true;
+    if (gameDifficulty === 'hard') return countryDifficulty === 'hard' || countryDifficulty === 'expert';
+    if (gameDifficulty === 'medium') return countryDifficulty === 'medium' || countryDifficulty === 'hard' || countryDifficulty === 'expert';
+    return countryDifficulty === 'easy';
+  }
+  
+  /**
+   * 管理可用国家池
+   */
+  private manageAvailableCountries(allCountries: Country[], isLimitedQuestionMode: boolean, isTimedMode: boolean): Country[] {
+    // 过滤已使用的国家
+    let availableCountries = allCountries.filter(c => !this.usedCountryIds.has(c.id));
+    
+    if (availableCountries.length < 4) {
+      if (isLimitedQuestionMode) {
+        // 对于有限题目模式，如果不够4个，抛出错误（应该不会发生，因为题目数量有限）
+        throw new Error('Not enough unique countries for limited question mode');
+      } else if (isTimedMode) {
+        // 对于限时模式，清除最旧的使用记录
+        this.clearOldestUsedCountries(allCountries, 10);
+        availableCountries = allCountries.filter(c => !this.usedCountryIds.has(c.id));
+      } else {
+        // 其他模式，保留最近20个
+        const usedArray = Array.from(this.usedCountryIds);
+        if (usedArray.length > 20) {
+          const toRemove = usedArray.slice(0, usedArray.length - 20);
+          toRemove.forEach(id => this.usedCountryIds.delete(id));
+          availableCountries = allCountries.filter(c => !this.usedCountryIds.has(c.id));
+        }
+      }
+    }
+    
+    return availableCountries;
+  }
+  
+  /**
+   * 清除最旧的使用记录
+   */
+  private clearOldestUsedCountries(_allCountries: Country[], keepCount: number): void {
+    const usedArray = Array.from(this.usedCountryIds);
+    if (usedArray.length <= keepCount) return;
+    
+    // 保留最近使用的keepCount个国家
+    const toRemove = usedArray.slice(0, usedArray.length - keepCount);
+    toRemove.forEach(id => this.usedCountryIds.delete(id));
+  }
+  
+  /**
+   * 选择错误答案（确保不重复）
+   */
+  private selectWrongAnswers(availableCountries: Country[], correctCountry: Country): Country[] {
+    let wrongCountries: Country[] = [];
+    
+    if (this.selectedContinent === 'World') {
+      // 世界模式：从可用国家中选择
+      const availableForWrong = availableCountries.filter(c => c.id !== correctCountry.id);
+      wrongCountries = this.selectUniqueWrongAnswers(availableForWrong, 3);
+    } else {
+      // 大洲模式：优先从同一大洲选择
+      const continentCountries = getCountriesByContinent(this.selectedContinent)
+        .filter(c => this.isDifficultyMatch(c.difficulty, this.session!.difficulty));
+      
+      const sameContinentAvailable = continentCountries.filter(country => 
+        country.id !== correctCountry.id &&
+        !this.usedCountryIds.has(country.id)
+      );
+      
+      if (sameContinentAvailable.length >= 3) {
+        wrongCountries = this.selectUniqueWrongAnswers(sameContinentAvailable, 3);
+      } else {
+        // 如果同一大洲不够，从可用国家中补充
+        const remainingNeeded = 3 - sameContinentAvailable.length;
+        const otherAvailable = availableCountries
+          .filter(c => c.id !== correctCountry.id && !sameContinentAvailable.find(sc => sc.id === c.id));
+        
+        const additionalWrong = this.selectUniqueWrongAnswers(otherAvailable, remainingNeeded);
+        wrongCountries = [...sameContinentAvailable, ...additionalWrong];
+      }
+    }
+    
+    // 如果还是不够3个，使用已使用的国家作为最后选择
+    if (wrongCountries.length < 3) {
+      const remainingNeeded = 3 - wrongCountries.length;
+      const usedCountries = this.getUsedCountriesForWrongAnswers(correctCountry);
+      const additionalWrong = this.selectUniqueWrongAnswers(usedCountries, remainingNeeded);
+      wrongCountries = [...wrongCountries, ...additionalWrong];
+    }
+    
+    return wrongCountries;
+  }
+  
+  /**
+   * 选择唯一的错误答案
+   */
+  private selectUniqueWrongAnswers(candidateCountries: Country[], count: number): Country[] {
+    return candidateCountries
+      .sort(() => 0.5 - Math.random())
+      .slice(0, count);
+  }
+  
+  /**
+   * 获取可用于错误答案的已使用国家
+   */
+  private getUsedCountriesForWrongAnswers(excludeCountry: Country): Country[] {
+    const allCountries = this.selectedContinent === 'World' 
+      ? getRandomCountries(1000, this.session!.difficulty)
+      : getCountriesByContinent(this.selectedContinent)
+          .filter(c => this.isDifficultyMatch(c.difficulty, this.session!.difficulty));
+    
+    return allCountries.filter(c => 
+      c.id !== excludeCountry.id &&
+      this.usedCountryIds.has(c.id)
+    );
+  }
+  
+  /**
+   * 标记使用的国家
+   */
+  private markUsedCountries(countries: Country[], isLimitedQuestionMode: boolean): void {
+    if (isLimitedQuestionMode) {
+      // 有限题目模式：标记所有选项国家
+      countries.forEach(country => this.usedCountryIds.add(country.id));
+    } else {
+      // 其他模式：只标记正确答案
+      this.usedCountryIds.add(countries[0].id);
+    }
   }
   
   /**

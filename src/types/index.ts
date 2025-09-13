@@ -86,23 +86,4 @@ export type Continent =
 
 export type RegionFilter = Continent | 'World';
 
-export interface LeaderboardEntry {
-  id: string;
-  playerName: string;
-  score: number;
-  correctAnswers: number;
-  totalQuestions: number;
-  accuracy: number;
-  streak: number;
-  mode: GameSession['mode'];
-  difficulty: GameSession['difficulty'];
-  continent: RegionFilter;
-  date: Date;
-  duration: number; // in seconds
-}
-
-export interface LeaderboardFilters {
-  mode?: GameSession['mode'];
-  continent?: RegionFilter;
-  timeFrame?: 'all' | 'today' | 'week' | 'month';
-}
+// Leaderboard functionality removed

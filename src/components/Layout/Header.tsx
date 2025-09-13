@@ -5,12 +5,10 @@ import { useI18n } from '../../i18n';
 import { soundService } from '../../services/soundService';
 
 interface HeaderProps {
-  onShowLeaderboard?: () => void;
   onShowFlagLibrary?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
-  onShowLeaderboard,
   onShowFlagLibrary,
 }) => {
   const { language, setLanguage } = useI18n();
@@ -42,14 +40,6 @@ export const Header: React.FC<HeaderProps> = ({
               className="px-3 py-1 text-sm flex items-center justify-center"
             >
               🚩
-            </Button>
-            <Button 
-              variant="outline" 
-              size="sm"
-              onClick={onShowLeaderboard}
-              className="px-3 py-1 text-sm flex items-center justify-center"
-            >
-              🏆
             </Button>
             <Button
               variant="outline"

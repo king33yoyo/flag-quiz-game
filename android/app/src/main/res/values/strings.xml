@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">国旗问答游戏</string>
+    <string name="title_activity_main">国旗问答游戏</string>
+    <string name="package_name">com.flagquiz.game</string>
+    <string name="custom_url_scheme">com.flagquiz.game</string>
+</resources>

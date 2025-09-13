@@ -215,6 +215,44 @@ export const GameBoard: React.FC<GameBoardProps> = ({
     }
   }, [mode, timeLeft, gameOver, endGame]);
   
+  const handleRestartGame = () => {
+    setGameOver(false);
+    setChallengeCompleted(false);
+    isGameEndingRef.current = false;
+    
+    // Clean up timer
+    if (timerRef.current) {
+      window.clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
+    
+    // Reset time for timed mode
+    if (mode === 'timed') {
+      setTimeLeft(60);
+    }
+    
+    // Start new game
+    const newSession = gameService.startGame(mode, difficulty, continent);
+    setSession(newSession);
+    
+    // Load first question
+    try {
+      const question = gameService.generateQuestion();
+      gameService.setCurrentQuestion(question);
+      setCurrentQuestion(question);
+      setSelectedAnswer(null);
+      setShowResult(false);
+    } catch (error) {
+      if (error instanceof Error && error.message === 'CHALLENGE_COMPLETED') {
+        setChallengeCompleted(true);
+        endGame(true);
+      } else {
+        console.error('Error loading question:', error);
+        endGame();
+      }
+    }
+  };
+
   if (!session || !currentQuestion) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -275,10 +313,9 @@ export const GameBoard: React.FC<GameBoardProps> = ({
       >
         <GameOverContent 
           session={session}
-          mode={mode}
-          difficulty={difficulty}
           continent={continent}
-          onPlayAgain={() => window.location.reload()}
+          onBackToMenu={onBackToMenu || (() => {})}
+          onRestartGame={() => handleRestartGame()}
           challengeSuccess={challengeCompleted}
         />
       </Modal>

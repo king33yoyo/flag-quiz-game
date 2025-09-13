@@ -4,7 +4,6 @@ import { I18nProvider, useI18n } from './i18n';
 import { Header } from './components/Layout/Header';
 import { Navigation } from './components/Layout/Navigation';
 import { GameBoard } from './components/Game/GameBoard';
-import { Leaderboard } from './components/Leaderboard/Leaderboard';
 import { FlagLibrary } from './components/FlagLibrary/FlagLibrary';
 
 /**
@@ -16,10 +15,9 @@ function AppContent() {
     difficulty: GameSession['difficulty'];
     continent: RegionFilter;
   } | null>(null);
-  const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [showFlagLibrary, setShowFlagLibrary] = useState(false);
 
-  const { t } = useI18n();
+  useI18n();
 
   const handleStartGame = (mode: GameSession['mode'], difficulty: GameSession['difficulty'], continent: RegionFilter = 'World') => {
     setCurrentGame({ mode, difficulty, continent });
@@ -37,7 +35,6 @@ function AppContent() {
   return (
     <div className="min-h-screen relative">
       <Header 
-        onShowLeaderboard={() => setShowLeaderboard(true)}
         onShowFlagLibrary={() => setShowFlagLibrary(true)}
       />
       
@@ -53,23 +50,13 @@ function AppContent() {
         ) : (
           <div>
             <div className="text-center mb-8">
-              <h2 className="text-3xl font-bold text-white mb-2">
-                {t('app.welcome')}
-              </h2>
-              <p className="text-base text-white">
-                {t('app.subtitle')}
-              </p>
+              {/* 主页面标题文字已删除 */}
             </div>
             <Navigation onStartGame={handleStartGame} />
           </div>
         )}
       </main>
       
-      {/* Leaderboard Modal */}
-      <Leaderboard 
-        isOpen={showLeaderboard}
-        onClose={() => setShowLeaderboard(false)}
-      />
       
       {/* Flag Library Modal */}
       <FlagLibrary 
