@@ -19,14 +19,40 @@ export const GameOverContent: React.FC<GameOverContentProps> = ({
 }) => {
   const { t, tWithParams } = useI18n();
 
-  const accuracy = session.totalQuestions > 0 
-    ? Math.round((session.correctAnswers / session.totalQuestions) * 100)
+  // 数据验证 - 确保数据有效性
+  const validatedSession = {
+    ...session,
+    correctAnswers: Math.max(session.correctAnswers || 0, 0),
+    totalQuestions: Math.max(session.totalQuestions || 0, 0),
+    score: Math.max(session.score || 0, 0)
+  };
+
+  // 如果数据被重置为零（重新开始游戏导致），显示0而不是错误的保护值
+  const accuracy = validatedSession.totalQuestions > 0
+    ? Math.round((validatedSession.correctAnswers / validatedSession.totalQuestions) * 100)
     : 0;
 
-  // 计算学习的国家数量（对于有限题目模式就是题目数，其他模式是正确答案数）
-  const learnedCountries = session.mode === 'flag-identify' || session.mode === 'country-select' 
-    ? session.totalQuestions 
-    : session.correctAnswers;
+  // 调试信息 - 详细的组件生命周期跟踪
+  if (process.env.NODE_ENV === 'development') {
+    console.log('GameOverContent 组件渲染 - 详细数据:', {
+      mode: session.mode,
+      sessionId: session.id,
+      originalData: {
+        correctAnswers: session.correctAnswers,
+        totalQuestions: session.totalQuestions,
+        score: session.score,
+        startTime: session.startTime,
+        endTime: session.endTime
+      },
+      validatedData: {
+        correctAnswers: validatedSession.correctAnswers,
+        totalQuestions: validatedSession.totalQuestions
+      },
+      accuracy: accuracy,
+      calculation: `${validatedSession.correctAnswers} / ${validatedSession.totalQuestions} * 100 = ${accuracy}%`,
+      honoraryTitle: accuracy === 100 ? 'master' : accuracy >= 90 ? 'expert' : 'other'
+    });
+  }
 
   // 荣誉称号系统基于准确率
   const getHonoraryTitle = (accuracy: number) => {
@@ -52,6 +78,15 @@ export const GameOverContent: React.FC<GameOverContentProps> = ({
 
   const honoraryTitle = getHonoraryTitle(accuracy);
   const encouragement = getEncouragement(accuracy);
+
+  // 调试信息
+  if (process.env.NODE_ENV === 'development') {
+    console.log('GameOverContent 荣誉称号:', {
+      accuracy,
+      honoraryTitle,
+      encouragement
+    });
+  }
 
   // 获取主题色
   const getThemeColor = (color: string) => {
@@ -98,9 +133,6 @@ export const GameOverContent: React.FC<GameOverContentProps> = ({
           </div>
           <div className="text-4xl font-bold mb-6 animate-titlePulse" style={{ color: getThemeColor(honoraryTitle.color) }}>
             {honoraryTitle.title}
-          </div>
-          <div className="text-lg text-gray-600 mb-4">
-            {tWithParams('gameOver.countriesLearned', { count: learnedCountries.toString() })}
           </div>
           <div className="text-lg text-gray-700 font-medium animate-scaleIn">
             {encouragement}

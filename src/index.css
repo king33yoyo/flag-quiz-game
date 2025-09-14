@@ -196,6 +196,45 @@ body::before {
   gap: 1rem;
 }
 
+/* Flag Display Optimization */
+.flag-display {
+  will-change: transform;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+}
+
+.flag-display img {
+  will-change: transform;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+  transition: opacity 0.2s ease-in-out;
+}
+
+.flag-display span {
+  display: inline-block;
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+/* Prevent flag flickering during re-renders */
+.flag-display img[src] {
+  opacity: 1;
+}
+
+.flag-display img:not([src]) {
+  opacity: 0;
+}
+
+/* Optimize question card transitions */
+.question-card {
+  will-change: transform;
+  backface-visibility: hidden;
+}
+
+.question-card .flag-display {
+  transition: none;
+}
+
 .grid-cols-2 {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
@@ -240,6 +279,18 @@ body::before {
 
 .mb-6 {
   margin-bottom: 1.5rem;
+}
+
+.mt-2 {
+  margin-top: 0.5rem;
+}
+
+.mt-4 {
+  margin-top: 1rem;
+}
+
+.mt-6 {
+  margin-top: 1.5rem;
 }
 
 .p-3 {
@@ -1047,7 +1098,7 @@ nav.card {
 }
 
 .mobile-main {
-  padding-top: 2.5rem;
+  padding-top: 1.5rem;
   padding-bottom: 1rem;
   min-height: calc(100vh - 5rem);
   min-height: calc(-webkit-fill-available - 5rem);
@@ -1056,7 +1107,7 @@ nav.card {
 }
 
 .mobile-title-spacing {
-  min-height: 3rem;
+  min-height: 2rem;
 }
 
 /* Enhanced mobile responsive styles */
@@ -1067,7 +1118,7 @@ nav.card {
   }
   
   .mobile-main {
-    padding-top: 2rem;
+    padding-top: 1.2rem;
     padding-bottom: 1rem;
   }
   
@@ -1088,7 +1139,7 @@ nav.card {
   }
   
   .mobile-main {
-    padding-top: 1.5rem;
+    padding-top: 1rem;
     padding-bottom: 0.75rem;
   }
 }

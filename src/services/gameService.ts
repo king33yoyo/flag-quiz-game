@@ -51,12 +51,13 @@ export class GameService {
     if (!this.session) {
       throw new Error('No active game session');
     }
+
     
     // 挑战模式使用专用逻辑
     if (this.session.mode === 'challenge') {
       return this.generateChallengeQuestion();
     }
-    
+
     // 其他模式使用原有逻辑
     return this.generateRegularQuestion();
   }
@@ -384,25 +385,47 @@ export class GameService {
     if (!this.session) {
       throw new Error('No active game session');
     }
-    
+
     // 使用临时存储的 currentQuestion 进行判定
     const isCorrect = answerId === this.currentQuestion?.correctAnswer;
+
     
     // Fixed base score with streak bonus
     const baseScore = 20;
     const streakBonus = isCorrect ? (this.session.streak || 0) * 5 : 0;
     const score = isCorrect ? baseScore + streakBonus : 0;
-    
-    // Update session
+
+    // Update session with validation
     this.session.score += score;
     this.session.correctAnswers += isCorrect ? 1 : 0;
     this.session.totalQuestions += 1;
     this.session.streak = isCorrect ? (this.session.streak || 0) + 1 : 0;
-    
+
+    // 调试信息
+    if (process.env.NODE_ENV === 'development') {
+      console.log('GameService submitAnswer 更新后:', {
+        isCorrect,
+        score,
+        correctAnswers: this.session.correctAnswers,
+        totalQuestions: this.session.totalQuestions,
+        streak: this.session.streak,
+        accuracy: this.session.totalQuestions > 0 ? Math.round((this.session.correctAnswers / this.session.totalQuestions) * 100) : 0
+      });
+    }
+
+    // 验证数据一致性
+    if (this.session.correctAnswers > this.session.totalQuestions) {
+      console.warn('Data inconsistency: correctAnswers > totalQuestions', {
+        correctAnswers: this.session.correctAnswers,
+        totalQuestions: this.session.totalQuestions
+      });
+      this.session.correctAnswers = this.session.totalQuestions;
+    }
+
     return {
       isCorrect,
       score,
-      session: this.session,
+      session: { ...this.session }, // 返回副本以避免引用问题
     };
   }
   
@@ -410,10 +433,38 @@ export class GameService {
     if (!this.session) {
       throw new Error('No active game session');
     }
-    
+
+    // 调试信息：endGame 前的状态
+    if (process.env.NODE_ENV === 'development') {
+      console.log('GameService endGame 前:', {
+        correctAnswers: this.session.correctAnswers,
+        totalQuestions: this.session.totalQuestions,
+        accuracy: this.session.totalQuestions > 0 ? Math.round((this.session.correctAnswers / this.session.totalQuestions) * 100) : 0
+      });
+    }
+
+    // 确保数据一致性
+    if (this.session.correctAnswers > this.session.totalQuestions) {
+      console.warn('Correcting data inconsistency: correctAnswers > totalQuestions');
+      this.session.correctAnswers = this.session.totalQuestions;
+    }
+
     this.session.endTime = new Date();
     const completedSession = { ...this.session };
+
+    // 调试信息：endGame 后的状态
+    if (process.env.NODE_ENV === 'development') {
+      console.log('GameService endGame 后:', {
+        correctAnswers: completedSession.correctAnswers,
+        totalQuestions: completedSession.totalQuestions,
+        accuracy: completedSession.totalQuestions > 0 ? Math.round((completedSession.correctAnswers / completedSession.totalQuestions) * 100) : 0
+      });
+    }
+
+    // 清理状态
     this.session = null;
+    this.currentQuestion = null;
+
     return completedSession;
   }
   

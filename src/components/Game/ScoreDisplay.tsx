@@ -32,7 +32,7 @@ export const ScoreDisplay: React.FC<ScoreDisplayProps> = ({
   };
   
   return (
-    <div className="card mb-6 animate-fadeIn">
+    <div className="card mb-2 animate-fadeIn">
       <div className="flex flex-wrap items-center justify-between gap-4">
         {/* Back button - Desktop */}
         {onBack && (

@@ -23,8 +23,7 @@ function AppContent() {
     setCurrentGame({ mode, difficulty, continent });
   };
 
-  const handleGameEnd = (session: GameSession) => {
-    console.log('Game ended:', session);
+  const handleGameEnd = (_session: GameSession) => {
     // Here you could save the score, show leaderboard, etc.
   };
 
@@ -38,7 +37,7 @@ function AppContent() {
         onShowFlagLibrary={() => setShowFlagLibrary(true)}
       />
       
-      <main className="max-w-7xl mx-auto px-4 py-8 relative z-10 mobile-main">
+      <main className="max-w-7xl mx-auto px-4 py-4 relative z-10 mobile-main">
         {currentGame ? (
           <GameBoard
             mode={currentGame.mode}

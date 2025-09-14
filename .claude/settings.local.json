@@ -30,7 +30,13 @@
       "Bash(set:*)",
       "Bash(dir \"C:\\Users\\k1030\\AppData\\Local\\Android\\Sdk\")",
       "Bash(powershell:*)",
-      "Bash(start:*)"
+      "Bash(start:*)",
+      "Bash(keytool:*)",
+      "Bash(copy:*)",
+      "Bash(cp:*)",
+      "Bash(unzip:*)",
+      "Bash(grep:*)",
+      "Bash(rm:*)"
     ],
     "deny": [],
     "ask": []
