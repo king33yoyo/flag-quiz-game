@@ -315,7 +315,7 @@ export const CountryDetail: React.FC<CountryDetailProps> = ({
               )}
             </div>
             <div>
-              <h2 className="text-2xl font-bold text-gray-800">
+              <h2 className="text-xl font-bold text-gray-800">
                 {getCountryName()}
               </h2>
               <p className="text-gray-600">

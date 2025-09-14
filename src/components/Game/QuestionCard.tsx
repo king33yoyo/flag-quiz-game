@@ -18,7 +18,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
   selectedAnswer,
   disabled = false,
 }) => {
-  const { t, tWithParams } = useI18n();
+  const { t, tWithParams, language } = useI18n();
   const getOptionStyle = (countryId: string) => {
     if (!showResult) return '';
     
@@ -36,7 +36,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
   return (
     <div className="card p-6 question-card">
       <div className="text-center mb-6">
-        <h2 className="text-2xl font-bold text-gray-800 mb-4">
+        <h2 className="text-xl font-bold text-gray-800 mb-4">
           {t('game.whichCountry')}
         </h2>
         <div className="flex justify-center">
@@ -68,7 +68,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
             style={{ animationDelay: `${index * 0.1}s` }}
           >
             <div className="font-semibold text-gray-800">
-              {country.nameZh ? `${country.nameZh} (${country.name})` : country.name}
+              {language === 'zh' && country.nameZh ? country.nameZh : country.name}
             </div>
           </div>
         ))}

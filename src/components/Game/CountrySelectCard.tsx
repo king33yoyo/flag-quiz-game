@@ -36,12 +36,9 @@ export const CountrySelectCard: React.FC<CountrySelectCardProps> = ({
   return (
     <div className="card p-6 question-card">
       <div className="text-center mb-6">
-        <h2 className="text-2xl font-bold text-gray-800 mb-4 animate-fadeIn">
+        <h2 className="text-xl font-bold text-gray-800 mb-4 animate-fadeIn">
           {tWithParams('game.whichCountryFlag', { country: question.country.nameZh || question.country.name })}
         </h2>
-        <div className="text-xl text-gray-600 mb-4 animate-fadeIn">
-          请选择正确的国旗
-        </div>
       </div>
       
       <div className="grid grid-cols-2 md:grid-cols-4 gap-6">

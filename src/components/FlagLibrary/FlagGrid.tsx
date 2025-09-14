@@ -40,6 +40,7 @@ export const FlagGrid: React.FC<FlagGridProps> = ({
             onClick={() => onCountryClick(country)}
             showName={showCountryNames}
             size="md"
+            language={language}
           />
           {showCountryNames && (
             <div className="mt-2 text-sm text-gray-600 text-center max-w-full">

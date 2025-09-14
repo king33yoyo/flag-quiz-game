@@ -7,6 +7,7 @@ interface FlagCardProps {
   disabled?: boolean;
   showName?: boolean;
   size?: 'sm' | 'md' | 'lg';
+  language?: 'en' | 'zh';
 }
 
 export const FlagCard: React.FC<FlagCardProps> = ({
@@ -16,6 +17,7 @@ export const FlagCard: React.FC<FlagCardProps> = ({
   disabled = false,
   showName = false,
   size = 'md',
+  language = 'en',
 }) => {
   // 检测是否为尼泊尔国旗
   const isNepal = country.id === 'np';
@@ -59,7 +61,7 @@ export const FlagCard: React.FC<FlagCardProps> = ({
       </div>
       {showName && (
         <div className="mt-1 text-xs font-medium text-gray-700 text-center px-1 truncate w-full">
-          {country.name}
+          {language === 'zh' && country.nameZh ? country.nameZh : country.name}
         </div>
       )}
     </div>
